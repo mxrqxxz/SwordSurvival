@@ -218,12 +218,11 @@ window.onload = function () {
         
         if (ninja.posicionTamaño < 2 || ninja.posicionTamaño > 11){
             ninja.posicionTamaño = 2;
-            ninja.posicionAnimacion = 0;
+            ninja.posicionAnimacion = 28;
         }
-        
-        ninja.totalAnimacion = 9;
-        ninja.posicionAnimacion = 28 + (ninja.posicionAnimacion + 1) % ninja.totalAnimacion;
+
         ninja.posicionTamaño++;
+        ninja.posicionAnimacion++;
 
         if (ninja.posicionTamaño > 11){
             ninja.saltoDerecha = false;
