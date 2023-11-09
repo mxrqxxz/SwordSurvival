@@ -147,6 +147,8 @@ window.onload = function () {
             ninja.velocidad = 3;
             if (ninja.izquierda) {
                 ninja.izquierdaAnimacion = true;
+            } else if (ninja.derecha == false){
+                ninja.estaticoIzquierda = true;    // Esto es para que no se gire el personaje, ya que si se queda todo en false, la animación por defecto será estático derecha, de ahí que no sea necesario controlarlo arriba en el caso del salto de la derecha
             }
             ninja.posicionTamaño = 0;
         }
