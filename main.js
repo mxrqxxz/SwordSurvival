@@ -35,15 +35,16 @@ window.onload = function () {
         this.estaticoIzquierda = false;
         this.saltoDerecha = false;
         this.saltoIzquierda = false;
+        this.ataqueDerecha = false;
 
         // -- Animaciones --
 
         this.posicionAnimacion = 0;
         this.totalAnimacion = 1;
-        this.animacionSamurai = /* Estatico Derecha */[[1150, 11], [1278, 11], [1406, 11], [1534, 11], [1662, 11], [1789, 11], /* Estatico Izquierda */[1053, 11], [925, 11], [797, 11], [669, 11], [541, 11], [414, 11], /* Movimiento Derecha */[2054, 274], [1926, 275], [1798, 274], [1670, 273], [1543, 275], [1414, 275], [1286, 274], [1157, 274], /* Movimiento Izquierda */[1048, 273], [919, 274], [791, 275], [662, 275], [535, 273], [407, 274], [279, 275], [150, 274], /* Salto Derecha */[1146, 911], [1282, 917], [1410, 920], [1537, 900], [1667, 905], [1795, 906], [1920, 907], /* Salto Izquierda */[1057, 911], [930, 917], [803, 920], [680, 900], [546, 905], [418, 906], [295, 907]];
+        this.animacionSamurai = /* Estatico Derecha */[[1150, 11], [1278, 11], [1406, 11], [1534, 11], [1662, 11], [1789, 11], /* Estatico Izquierda */[1053, 11], [925, 11], [797, 11], [669, 11], [541, 11], [414, 11], /* Movimiento Derecha */[2054, 274], [1926, 275], [1798, 274], [1670, 273], [1543, 275], [1414, 275], [1286, 274], [1157, 274], /* Movimiento Izquierda */[1048, 273], [919, 274], [791, 275], [662, 275], [535, 273], [407, 274], [279, 275], [150, 274], /* Salto Derecha */[1146, 911], [1282, 917], [1410, 920], [1537, 900], [1667, 905], [1795, 906], [1920, 907], /* Salto Izquierda */[1057, 911], [930, 917], [803, 920], [680, 900], [546, 905], [418, 906], [295, 907], /* Ataque Derecha */ [1157, 400], [1285, 400], [1409, 400], [1537, 400], [1153, 656], [1258, 656], [1397, 654], [1525, 651], [1157, 518], [1286, 496], [1414, 490], [1544, 496], [1681, 534]];
 
         this.posicionTamaño = 0;
-        this.tamañoAnimacion = /* Estatico */[[58, 70], /* Corriendo */[54, 64], /* Saltando */[56, 67], [47, 61], [47, 58], [42, 72], [46, 59], [46, 59], [44, 65]];
+        this.tamañoAnimacion = /* Estatico */[[58, 70], /* Corriendo */[54, 64], /* Saltando */[56, 67], [47, 61], [47, 58], [42, 72], [46, 59], [46, 59], [44, 65], /* Atacando */ [50, 65], [50, 65], [98, 65], [92, 65], [44, 65], [66, 65], [95, 67], [75, 70], [57, 75], [53, 97], [51, 103], [65, 97], [85, 59]];
 
         this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
         this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
@@ -115,7 +116,7 @@ window.onload = function () {
 
         // Solo será para el salto
         ninja.y -= 40;
-        ninja.velocidad = 10;
+        ninja.velocidad = 8;
     }
 
     function moverAbajo() {
@@ -164,23 +165,25 @@ window.onload = function () {
         ninja.estaticoIzquierda = false;
     }
 
+    function permitirAtaque() {
+        
+    }
+
     function activaMovimiento(evt) {
 
         if (evt.keyCode === 38 || evt.keyCode === 87) {
             if(!ninja.saltoDerecha && !ninja.saltoIzquierda){
                 permitirSalto();
             }
-
-            // Teclas Flecha Arriba y w
-        }
-
-        // Teclas Flecha Izquierda y a
-        if (evt.keyCode === 37 || evt.keyCode === 65) {
+        } else if (evt.keyCode === 18) {
+            // Tecla altIzquierda
+            permitirAtaque();
+        } else if (evt.keyCode === 37 || evt.keyCode === 65) {
+            // Teclas Flecha Izquierda y a
             permitirMoverIzquierda();
         } else if (evt.keyCode === 39 || evt.keyCode === 68) {
-            permitirMoverDerecha();
-
             // Teclas Flecha Derecha y d
+            permitirMoverDerecha();
         }
     }
 

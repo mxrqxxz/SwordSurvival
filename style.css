@@ -2,7 +2,6 @@ body {
     padding: 0;
     margin: 0;
     background-color: #f7f7f7;
-    background-image: url(assets/images/fondoPatron.avif);
     font-family: 'Cinzel', serif;
 }
 
@@ -22,6 +21,6 @@ canvas {
     margin: auto;
     place-items: center;
     background-image: url(assets/images/Background.png);
-    margin-top: 50px;
-    margin-bottom: 50px;
+    margin-top: 30px;
+    margin-bottom: 30px;
 }
