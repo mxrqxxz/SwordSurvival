@@ -1,3 +1,27 @@
+body {
+    padding: 0;
+    margin: 0;
+    background-color: #f7f7f7;
+    background-image: url(assets/images/fondoPatron.avif);
+    font-family: 'Cinzel', serif;
+}
+
+.contenedor {
+    background-color: #f7f7f7;
+    text-align: center;
+}
+
+h1 {
+    margin-top: -5px;
+}
+
 canvas {
+    border-radius: 30px;
+    box-shadow: 0px 0px 50px 0px black;
+    display: grid;
+    margin: auto;
+    place-items: center;
     background-image: url(assets/images/Background.png);
+    margin-top: 50px;
+    margin-bottom: 50px;
 }

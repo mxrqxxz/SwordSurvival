@@ -7,7 +7,7 @@ window.onload = function () {
     let ySuelo = 540;
 
     function limpiarLienzo() {
-        ctx.clearRect(0, 0, 1000, 600);
+        ctx.clearRect(0, 0, 1200, 600);
     }
 
 
@@ -20,7 +20,7 @@ window.onload = function () {
     function samurai(x_, y_) {
         this.x = x_;
         this.y = y_;
-        this.velocidad = 3;
+        this.velocidad = 5;
 
         // -- Movimientos --
 
@@ -114,14 +114,14 @@ window.onload = function () {
     function moverArriba() {
 
         // Solo será para el salto
-        ninja.y -= 50;
-        ninja.velocidad = 5;
+        ninja.y -= 40;
+        ninja.velocidad = 10;
     }
 
     function moverAbajo() {
 
         // Para caer del salto
-        ninja.y += 50;
+        ninja.y += 40;
     }
 
     function permitirSalto() {
@@ -167,7 +167,9 @@ window.onload = function () {
     function activaMovimiento(evt) {
 
         if (evt.keyCode === 38 || evt.keyCode === 87) {
-            permitirSalto();
+            if(!ninja.saltoDerecha && !ninja.saltoIzquierda){
+                permitirSalto();
+            }
 
             // Teclas Flecha Arriba y w
         }
@@ -373,5 +375,5 @@ window.onload = function () {
 
     ninja = new samurai(x, y);
     let id1 = setInterval(iniciar, 1000 / 60);
-    let id2 = setInterval(animacion, 1000 / 8);
+    let id2 = setInterval(animacion, 1000 / 10);
 }
