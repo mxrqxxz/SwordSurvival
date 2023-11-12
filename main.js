@@ -2,9 +2,12 @@ window.onload = function () {
     let canvas;
     let ctx;
     let imagenSamurai;
+    let imagenEnemigoEspadas;
     let x = 450; // Coordenada ninja inicial
     let y = 470; // Coordenada ninja inicial
     let ySuelo = 540;
+    let numeroEnemigosEspadas = 1;
+    let matrizEnemigosEspadas = [];
 
     function limpiarLienzo() {
         ctx.clearRect(0, 0, 1200, 600);
@@ -405,6 +408,156 @@ window.onload = function () {
     
     }
 
+    /*
+    =======================================
+    || Constructor Enemigo general
+    ========================================
+    */
+
+    function enemigo() {
+        this.x = (Math.random() * 500);
+        this.velocidad = 2;
+
+        // -- Booleanos para animaciones --
+
+        this.izquierdaAnimacion = false;
+        this.derechaAnimacion = false;
+        this.ataqueDerecha = false;
+        this.ataqueIzquierda = false;
+
+        this.posicionAnimacion = 0;
+        this.totalAnimacion = 1;
+        this.posicionTamaño = 0;
+    }
+
+    enemigo.prototype.mover = function () {
+        if (ninja.x > this.x){
+            this.x += this.velocidad;
+            if (ninja.x < this.x + this.tamañoX + 50){
+                this.ataqueDerecha = true;
+                this.ataqueIzquierda = false;
+                this.derechaAnimacion = false;
+                this.izquierdaAnimacion = false;
+            } else {
+                this.derechaAnimacion = true;
+                this.izquierdaAnimacion = false;
+                this.ataqueDerecha = false;
+                this.ataqueIzquierda = false;
+            }
+        } else {
+            this.x -= this.velocidad;
+            if (ninja.x + ninja.tamañoX > this.x - 50){
+                this.ataqueDerecha = false;
+                this.ataqueIzquierda = true;
+                this.derechaAnimacion = false;
+                this.izquierdaAnimacion = false;
+            } else {
+                this.izquierdaAnimacion = true;
+                this.derechaAnimacion = false;
+                this.ataqueDerecha = false;
+                this.ataqueIzquierda = false;
+            }
+        }
+    }
+
+    /*
+    =======================================
+    || Constructor Enemigo de dos espadas
+    ========================================
+    */
+
+
+    function enemigoEspadas() {
+
+        // -- Animaciones --
+
+        this.animacionEnemigo = [/* Corriendo Derecha */ [877, 226], [973, 225], [1069, 224], [1165, 225], [1261, 224], [1357, 223], /* Corriendo Izquierda */ [791, 226], [695, 225], [599, 224], [503, 225], [407, 225], [311, 223], /* Atacando derecha */ [990, 420], [1084, 420], [888, 516], [981, 516], [1076, 516], [1172, 516], [1267, 516], /* Atacando Izquierda */ [689, 420], [565, 420], [767, 516], [688, 516], [601, 516], [473, 516], [381, 516]];
+
+        this.tamañoAnimacion = [/* Corriendo */ [48, 62], [48,63], [48, 64], [48, 63], [48, 64], [48, 65], /* Atacando */ [37, 60], [67, 60], [61, 60], [47, 60], [39, 60], [71, 60], [68, 60]];
+
+        this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
+        this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
+
+        this.y = ySuelo - this.tamañoY; // Cada enemigo tendrá una coordenada Y distinta
+    }
+
+    imagenEnemigoEspadas = new Image();
+    imagenEnemigoEspadas.src = "assets/sprites/enemigos/orcoespadas.png";
+    enemigoEspadas.prototype = new enemigo(); // Herencia
+    enemigoEspadas.prototype.imagen = imagenEnemigoEspadas;
+    enemigoEspadas.prototype.recalcularTamaño = function () {
+        this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
+        this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
+    }
+
+    enemigoEspadas.prototype.pintar = function () {
+        this.mover();
+        ctx.drawImage(
+            this.imagen,
+            this.animacionEnemigo[this.posicionAnimacion][0],
+            this.animacionEnemigo[this.posicionAnimacion][1],
+            this.tamañoX,
+            this.tamañoY,
+            this.x,
+            this.y,
+            this.tamañoX,
+            this.tamañoY
+        );
+    }
+
+    function crearEnemigosEspadas() {
+        for (let i = 0; i < numeroEnemigosEspadas; i++){
+            let enemigoEspada = new enemigoEspadas();
+            matrizEnemigosEspadas.push(enemigoEspada);
+        }
+    }
+
+    function pintarEnemigosEspadas() {
+        matrizEnemigosEspadas.forEach(element => {
+            element.pintar();
+        });
+    }
+
+    /*
+    ======================================================
+    || Animaciones enemigoEspadas
+    =======================================================
+    */
+
+    enemigoEspadas.prototype.animacionCorrerDerecha = function () {
+        this.totalAnimacion = 6;
+        this.posicionTamaño = 0 + (this.posicionTamaño + 1) % this.totalAnimacion;
+        this.posicionAnimacion = 0 + (this.posicionAnimacion + 1) % this.totalAnimacion;
+        this.recalcularTamaño();
+    }
+
+    enemigoEspadas.prototype.animacionCorrerIzquierda = function () {
+        this.totalAnimacion = 6;
+        this.posicionTamaño = 0 + (this.posicionTamaño + 1) % this.totalAnimacion;
+        this.posicionAnimacion = 6 + (this.posicionAnimacion + 1) % this.totalAnimacion;
+        this.recalcularTamaño();
+    }
+
+    enemigoEspadas.prototype.animacionAtaqueDerecha = function () {
+        this.totalAnimacion = 7;
+        this.posicionTamaño = 6 + (this.posicionTamaño + 1) % this.totalAnimacion;
+        this.posicionAnimacion = 12 + (this.posicionAnimacion + 1) % this.totalAnimacion;
+        this.recalcularTamaño();
+    }
+
+    enemigoEspadas.prototype.animacionAtaqueIzquierda = function () {
+        this.totalAnimacion = 7;
+        this.posicionTamaño = 6 + (this.posicionTamaño + 1) % this.totalAnimacion;
+        this.posicionAnimacion = 19 + (this.posicionAnimacion + 1) % this.totalAnimacion;
+        this.recalcularTamaño();
+    }
+
+    /*
+    =======================================
+    || Control de animaciones
+    ========================================
+    */
+
     function animacion() {
 
         if (!ninja.estaticoIzquierda && !ninja.izquierdaAnimacion && !ninja.estaticoDerecha && !ninja.derechaAnimacion && !ninja.saltoDerecha && !ninja.saltoIzquierda && !ninja.ataqueDerecha && !ninja.ataqueIzquierda) {
@@ -438,8 +591,20 @@ window.onload = function () {
             animacionCorrerDerecha();
         }
 
+        if (matrizEnemigosEspadas.length > 0){
+            matrizEnemigosEspadas.forEach(element => {
+                if (element.ataqueDerecha){
+                    element.animacionAtaqueDerecha();
+                } else if (element.ataqueIzquierda) {
+                    element.animacionAtaqueIzquierda();
+                } else if (element.derechaAnimacion){
+                    element.animacionCorrerDerecha();
+                } else if (element.izquierdaAnimacion) {
+                    element.animacionCorrerIzquierda();
+                }
+            });
+        }
     }
-
 
     /* 
     ============================================================
@@ -450,6 +615,7 @@ window.onload = function () {
     function iniciar() {
         limpiarLienzo();
         pintarNinja();
+        pintarEnemigosEspadas();
     }
 
     canvas = document.getElementById("miCanvas");
@@ -464,6 +630,7 @@ window.onload = function () {
     document.addEventListener("keyup", paraMovimiento, false);
 
     ninja = new samurai(x, y);
+    crearEnemigosEspadas();
     let id1 = setInterval(iniciar, 1000 / 60);
     let id2 = setInterval(animacion, 1000 / 10);
 }
