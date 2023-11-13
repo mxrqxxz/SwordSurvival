@@ -22,7 +22,7 @@ window.onload = function () {
     let enemigoDerecha; // Coordenada X mas su tamaño X
     let enemigoArriba; // Coordenada Y
     let enemigoAbajo; // Coordenada Y mas su tamaño Y
-    let valorRectanguloFinal = 0;
+    let valorRectanguloFinal = 0; // Valor para hacer el efecto cortina al acabar el juego
 
     function limpiarLienzo() {
         ctx.clearRect(0, 0, 1200, 600);
@@ -76,10 +76,15 @@ window.onload = function () {
     imagenSamurai = new Image();
     imagenSamurai.src = "assets/sprites/samurai/samuraiDefinitivo.png";
     samurai.prototype.imagen = imagenSamurai;
+
+    // Cada frame de cada animacion puede tener un tamaño diferente
     samurai.prototype.recalcularTamaño = function () {
         this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
         this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
     }
+
+    // Cada frame puede tener un tamaño Y diferente, 
+    // por lo que si es inferior al anterior se podría quedar el personaje levitando
     samurai.prototype.recalcularY = function () {
         this.y = ySuelo - this.tamañoY;
     }
@@ -104,6 +109,7 @@ window.onload = function () {
     */
 
     function mostrarIconoVida() {
+        // Icono de la gota de sangre
         ctx.drawImage(
             iconoVida,
             0,
@@ -128,20 +134,20 @@ window.onload = function () {
             7,
             15
         );
-        ctx.fillStyle = "#800000"; // Para el cuadrado de la vida
+        ctx.fillStyle = "#800000"; // Para el rectangulo de la vida
         ctx.fillRect(
             80,
             65,
-            ninja.vida,
+            ninja.vida, // Así hago que se vaya haciendo más pequeño
             15
         );
-        ctx.drawImage( // Acabado redondo de la barra de vida
+        ctx.drawImage( // Acabado redondo del final de la barra de vida
             iconoVidaDer,
             0,
             0,
             7,
             15,
-            80 + ninja.vida, // Al final de la barra de vida
+            80 + ninja.vida, // Se añade al final de la barra de vida
             65,
             7,
             15
@@ -149,23 +155,29 @@ window.onload = function () {
     }
 
     function finDelJuego() {
-        eliminarEnemigos();
-        clearInterval(id1);
+        eliminarEnemigos(); // Limpiamos enemigos para la siguiente partida
+        clearInterval(id1); // Limpiamos intervalo del juego
         console.log("Fin intervalo 1");
-        clearInterval(id2);
+        clearInterval(id2); // Limpiamos intervalo de las animaciones
         console.log("Fin intervalo 2");
-        id3 = setInterval(animacionFinJuego, 400);
+        id3 = setInterval(animacionFinJuego, 400); // Creamos un nuevo intervalo destinado a la animcion final del juego
     }
 
     function animacionFinJuego() {
         limpiarLienzo();
+
+        // Cremamos el efecto cortina
         ctx.fillStyle = "black";
         ctx.fillRect(0,0, canvas.width, valorRectanguloFinal);
         ctx.fillRect(0,canvas.height, canvas.width, -valorRectanguloFinal);
         valorRectanguloFinal += 80;
+
+        // Metemos texto
         ctx.fillStyle = "white";
         ctx.font = "40px Cinzel";
         ctx.fillText("NADIE DIJO QUE SERÍA FÁCIL", 300, 250);
+
+        // Animamos al personaje muriendo
         if (ninja.muerteDerecha){
             animacionMuerteDerecha();
         } else {
@@ -260,7 +272,7 @@ window.onload = function () {
         } else if (ninja.izquierda || ninja.estaticoIzquierda) {
             ninja.saltoIzquierda = true;
         }
-        ninja.velocidad += 1;
+        ninja.velocidad += 1; // Para que no se note lento el salto
     }
 
     function terminarSalto() {
@@ -294,6 +306,8 @@ window.onload = function () {
     }
 
     function permitirAtaque() {
+
+        // Atacamos en funcion del lado al que mire el ninja
         if (ninja.derecha || ninja.estaticoDerecha) {
             ninja.ataqueDerecha = true;
         } else if (ninja.izquierda || ninja.estaticoIzquierda) {
@@ -585,7 +599,7 @@ window.onload = function () {
 
     /*
     =======================================
-    || Constructor Enemigo general
+    || Enemigo general
     ========================================
     */
 
@@ -616,6 +630,7 @@ window.onload = function () {
         enemigoArriba = this.y;
         enemigoAbajo = this.y + this.tamañoY;
 
+        // Comprobamos colisiones
         if (ninjaIzquierda <= enemigoDerecha && ninjaDerecha >= enemigoIzquierda && ninjaArriba <= enemigoAbajo && ninjaAbajo >= enemigoArriba) {
             // Determinar el lado de la colisión
             if (ninjaIzquierda <= enemigoIzquierda) { // Colisión en el lado derecho
@@ -646,7 +661,7 @@ window.onload = function () {
                 this.ataqueIzquierda = false;
                 this.derechaAnimacion = false;
                 this.izquierdaAnimacion = false;
-            } else {
+            } else { // El enemigo simplemente corre si no se encuentra a una distancia para atacar
                 this.derechaAnimacion = true;
                 this.izquierdaAnimacion = false;
                 this.ataqueDerecha = false;
@@ -659,7 +674,7 @@ window.onload = function () {
                 this.ataqueIzquierda = true;
                 this.derechaAnimacion = false;
                 this.izquierdaAnimacion = false;
-            } else {
+            } else { // El enemigo simplemente corre si no se encuentra a una distancia para atacar
                 this.izquierdaAnimacion = true;
                 this.derechaAnimacion = false;
                 this.ataqueDerecha = false;
@@ -818,6 +833,8 @@ window.onload = function () {
         } else if (ninja.derechaAnimacion) {
             animacionCorrerDerecha();
         }
+
+        // Control de animaciones de enemigos
 
         if (matrizEnemigosEspadas.length > 0) {
             matrizEnemigosEspadas.forEach(element => {
