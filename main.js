@@ -2,6 +2,7 @@ window.onload = function () {
     let canvas;
     let ctx;
     let imagenSamurai;
+    let imagenSamuraiVida;
     let imagenEnemigoEspadas;
     let x = 450; // Coordenada ninja inicial
     let y = 470; // Coordenada ninja inicial
@@ -69,6 +70,33 @@ window.onload = function () {
     }
     samurai.prototype.recalcularY = function () {
         this.y = ySuelo - this.tamañoY;
+    }
+
+    /* 
+    ============================================================
+    ||   BARRA DE VIDA  DEL NINJA
+    ============================================================
+    */
+
+    function mostrarVida() {
+        ctx.drawImage(
+            ninja.imagenVida,
+            0,
+            0,
+            50,
+            50,
+            15,
+            50,
+            50,
+            50
+        );
+        ctx.fillStyle = "red";
+        ctx.fillRect(
+            80,
+            65,
+            ninja.vida,
+            15
+        );
     }
 
     /* 
@@ -450,12 +478,14 @@ window.onload = function () {
                     this.vida -= 1;
                 } else {
                     ninja.vida -= 1;
+                    mostrarVida();
                 }
             } else { // Colisión en el lado izquierdo
                 if (ninja.ataqueIzquierda === true) {
                     this.vida -= 1;
                 } else {
                     ninja.vida -= 1;
+                    mostrarVida();
                 }
             }
         } else if (ninjaIzquierda >= enemigoDerecha) {
@@ -655,6 +685,10 @@ window.onload = function () {
     imagenSamurai.src = "assets/sprites/samurai/samuraiDefinitivo.png";
     samurai.prototype.imagen = imagenSamurai;
 
+    imagenSamuraiVida = new Image();
+    imagenSamuraiVida.src = "assets/images/iconoVida.png";
+    samurai.prototype.imagenVida = imagenSamuraiVida;
+
     document.addEventListener("keydown", activaMovimiento, false);
     document.addEventListener("keyup", paraMovimiento, false);
 
@@ -662,4 +696,5 @@ window.onload = function () {
     crearEnemigosEspadas();
     let id1 = setInterval(iniciar, 1000 / 60);
     let id2 = setInterval(animacion, 1000 / 10);
+    mostrarVida();
 }
