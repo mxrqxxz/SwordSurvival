@@ -2,7 +2,9 @@ window.onload = function () {
     let canvas;
     let ctx;
     let imagenSamurai;
-    let imagenSamuraiVida;
+    let iconoVida;
+    let iconoVidaIzq;
+    let iconoVidaDer;
     let imagenEnemigoEspadas;
     let x = 450; // Coordenada ninja inicial
     let y = 470; // Coordenada ninja inicial
@@ -12,13 +14,16 @@ window.onload = function () {
     let enemigoEspada;
     let ninjaIzquierda; // Coordenada X
     let ninjaDerecha; // Coordenada X mas su tamaño X
+    let ninjaArriba; // Coordenada Y
+    let ninjaAbajo; // Coordenada Y mas su tamaño Y
     let enemigoIzquierda; // Coordenada X
     let enemigoDerecha; // Coordenada X mas su tamaño X
+    let enemigoArriba; // Coordenada Y
+    let enemigoAbajo; // Coordenada Y mas su tamaño Y
 
     function limpiarLienzo() {
         ctx.clearRect(0, 0, 1200, 600);
     }
-
 
     /* 
     ============================================================
@@ -72,15 +77,21 @@ window.onload = function () {
         this.y = ySuelo - this.tamañoY;
     }
 
+    samurai.prototype.comprobarVida = function () {
+        if (this.vida <= 0){
+            this.vida = 0;
+        }
+    }
+
     /* 
     ============================================================
     ||   BARRA DE VIDA  DEL NINJA
     ============================================================
     */
 
-    function mostrarVida() {
+    function mostrarIconoVida() {
         ctx.drawImage(
-            ninja.imagenVida,
+            iconoVida,
             0,
             0,
             50,
@@ -90,11 +101,34 @@ window.onload = function () {
             50,
             50
         );
-        ctx.fillStyle = "red";
+    }
+    function mostrarVida() {
+        ctx.drawImage( // Acabado redondo de la barra de vida
+            iconoVidaIzq,
+            0,
+            0,
+            7,
+            15,
+            73,
+            65,
+            7,
+            15
+        );
         ctx.fillRect(
             80,
             65,
             ninja.vida,
+            15
+        );
+        ctx.drawImage( // Acabado redondo de la barra de vida
+            iconoVidaDer,
+            0,
+            0,
+            7,
+            15,
+            80 + ninja.vida, // Al final de la barra de vida
+            65,
+            7,
             15
         );
     }
@@ -118,7 +152,11 @@ window.onload = function () {
     }
 
     function moverIzquierda() {
-        ninja.x -= ninja.velocidad;
+        if (ninja.x <= 0) { // Control de los limites del mapa
+            ninja.x = 0;
+        } else {
+            ninja.x -= ninja.velocidad;            
+        }
     }
 
     function permitirMoverDerecha() {
@@ -134,7 +172,11 @@ window.onload = function () {
     }
 
     function moverDerecha() {
-        ninja.x += ninja.velocidad;
+        if (ninja.x >= canvas.width - ninja.tamañoX){ // Control de los limites del mapa
+            ninja.x = canvas.width - ninja.tamañoX;
+        } else {
+            ninja.x += ninja.velocidad;
+        }
     }
 
     function noPermitirMoverIzquierda() {
@@ -468,24 +510,28 @@ window.onload = function () {
     enemigo.prototype.mover = function () {
         ninjaIzquierda = ninja.x;
         ninjaDerecha = ninja.x + ninja.tamañoX;
+        ninjaArriba = ninja.y;
+        ninjaAbajo = ninja.y + ninja.tamañoY;
         enemigoIzquierda = this.x;
         enemigoDerecha = this.x + this.tamañoX;
+        enemigoArriba = this.y;
+        enemigoAbajo = this.y + this.tamañoY;
 
-        if (ninjaIzquierda < enemigoDerecha && ninjaDerecha > enemigoIzquierda) {
+        if (ninjaIzquierda < enemigoDerecha && ninjaDerecha > enemigoIzquierda && ninjaArriba < enemigoAbajo && ninjaAbajo > enemigoArriba) {
             // Determinar el lado de la colisión
             if (ninjaIzquierda < enemigoIzquierda) { // Colisión en el lado derecho
                 if (ninja.ataqueDerecha === true) {
                     this.vida -= 1;
                 } else {
                     ninja.vida -= 1;
-                    mostrarVida();
+                    ninja.comprobarVida();
                 }
             } else { // Colisión en el lado izquierdo
                 if (ninja.ataqueIzquierda === true) {
                     this.vida -= 1;
                 } else {
                     ninja.vida -= 1;
-                    mostrarVida();
+                    ninja.comprobarVida();
                 }
             }
         } else if (ninjaIzquierda >= enemigoDerecha) {
@@ -673,8 +719,10 @@ window.onload = function () {
 
     function iniciar() {
         limpiarLienzo();
-        pintarNinja();
         pintarEnemigosEspadas();
+        pintarNinja();
+        mostrarIconoVida();
+        mostrarVida();
     }
 
     canvas = document.getElementById("miCanvas");
@@ -685,9 +733,14 @@ window.onload = function () {
     imagenSamurai.src = "assets/sprites/samurai/samuraiDefinitivo.png";
     samurai.prototype.imagen = imagenSamurai;
 
-    imagenSamuraiVida = new Image();
-    imagenSamuraiVida.src = "assets/images/iconoVida.png";
-    samurai.prototype.imagenVida = imagenSamuraiVida;
+    iconoVida = new Image();
+    iconoVida.src = "assets/images/iconoVida.png";
+
+    iconoVidaIzq = new Image();
+    iconoVidaIzq.src = "assets/images/barraVidaIzquierda.png";
+
+    iconoVidaDer = new Image();
+    iconoVidaDer.src = "assets/images/barraVidaDerecha.png";
 
     document.addEventListener("keydown", activaMovimiento, false);
     document.addEventListener("keyup", paraMovimiento, false);
@@ -696,5 +749,5 @@ window.onload = function () {
     crearEnemigosEspadas();
     let id1 = setInterval(iniciar, 1000 / 60);
     let id2 = setInterval(animacion, 1000 / 10);
-    mostrarVida();
+    ctx.fillStyle = "#800000"; // Para el cuadrado de la vida
 }
