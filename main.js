@@ -1,6 +1,8 @@
 window.onload = function () {
     let canvas;
     let ctx;
+    let botonEmpezar;
+    let ninja;
     let imagenSamurai;
     let iconoVida;
     let iconoVidaIzq;
@@ -126,6 +128,7 @@ window.onload = function () {
             7,
             15
         );
+        ctx.fillStyle = "#800000"; // Para el cuadrado de la vida
         ctx.fillRect(
             80,
             65,
@@ -146,6 +149,7 @@ window.onload = function () {
     }
 
     function finDelJuego() {
+        eliminarEnemigos();
         clearInterval(id1);
         console.log("Fin intervalo 1");
         clearInterval(id2);
@@ -552,6 +556,8 @@ window.onload = function () {
         } else {
             clearInterval(id3);
             console.log("Fin del juego");
+            botonEmpezar.disabled = false;
+            botonEmpezar.style.textDecoration = "none";
         }
         ninja.recalcularTamaño();
         ninja.recalcularY();
@@ -570,6 +576,8 @@ window.onload = function () {
         } else {
             clearInterval(id3);
             console.log("Fin del juego");
+            botonEmpezar.disabled = false;
+            botonEmpezar.style.textDecoration = "none";
         }
         ninja.recalcularTamaño();
         ninja.recalcularY();
@@ -608,9 +616,9 @@ window.onload = function () {
         enemigoArriba = this.y;
         enemigoAbajo = this.y + this.tamañoY;
 
-        if (ninjaIzquierda < enemigoDerecha && ninjaDerecha > enemigoIzquierda && ninjaArriba < enemigoAbajo && ninjaAbajo > enemigoArriba) {
+        if (ninjaIzquierda <= enemigoDerecha && ninjaDerecha >= enemigoIzquierda && ninjaArriba <= enemigoAbajo && ninjaAbajo >= enemigoArriba) {
             // Determinar el lado de la colisión
-            if (ninjaIzquierda < enemigoIzquierda) { // Colisión en el lado derecho
+            if (ninjaIzquierda <= enemigoIzquierda) { // Colisión en el lado derecho
                 if (ninja.ataqueDerecha === true) {
                     this.vida -= 1;
                 } else {
@@ -756,6 +764,20 @@ window.onload = function () {
 
     /*
     =======================================
+    || Eliminar todos los enemigos
+    ========================================
+    */
+
+    function eliminarEnemigos() {
+        if (matrizEnemigosEspadas.length > 0){
+            for (let i = 0; i < matrizEnemigosEspadas.length; i++){
+                matrizEnemigosEspadas.splice(i, 1);
+            }
+        }
+    }
+
+    /*
+    =======================================
     || Control de animaciones
     ========================================
     */
@@ -828,6 +850,16 @@ window.onload = function () {
 
     canvas = document.getElementById("miCanvas");
     ctx = canvas.getContext('2d');
+    botonEmpezar = document.getElementById("empezar");
+
+    botonEmpezar.onclick = function () {
+        botonEmpezar.disabled = true;
+        botonEmpezar.style.textDecoration = "line-through";
+        ninja = new samurai(x, y);
+        crearEnemigosEspadas();
+        id1 = setInterval(iniciar, 1000 / 60);
+        id2 = setInterval(animacion, 1000 / 10);
+    }
 
 
     imagenSamurai = new Image();
@@ -846,10 +878,7 @@ window.onload = function () {
     document.addEventListener("keydown", activaMovimiento, false);
     document.addEventListener("keyup", paraMovimiento, false);
 
-    ninja = new samurai(x, y);
-    crearEnemigosEspadas();
-    let id1 = setInterval(iniciar, 1000 / 60);
-    let id2 = setInterval(animacion, 1000 / 10);
+    let id1;
+    let id2;
     let id3;
-    ctx.fillStyle = "#800000"; // Para el cuadrado de la vida
 }
