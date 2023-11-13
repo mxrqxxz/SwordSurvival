@@ -20,6 +20,7 @@ window.onload = function () {
     let enemigoDerecha; // Coordenada X mas su tamaño X
     let enemigoArriba; // Coordenada Y
     let enemigoAbajo; // Coordenada Y mas su tamaño Y
+    let valorRectanguloFinal = 0;
 
     function limpiarLienzo() {
         ctx.clearRect(0, 0, 1200, 600);
@@ -52,15 +53,19 @@ window.onload = function () {
         this.saltoIzquierda = false;
         this.ataqueDerecha = false;
         this.ataqueIzquierda = false;
+        this.heridoDerecha = false;
+        this.heridoIzquierda = false;
+        this.muerteDerecha = false;
+        this.muerteIzquierda = false;
 
         // -- Animaciones --
 
         this.posicionAnimacion = 0;
         this.totalAnimacion = 1;
-        this.animacionSamurai = /* Estatico Derecha */[[1150, 11], [1278, 11], [1406, 11], [1534, 11], [1662, 11], [1789, 11], /* Estatico Izquierda */[1053, 11], [925, 11], [797, 11], [669, 11], [541, 11], [414, 11], /* Movimiento Derecha */[2054, 274], [1926, 275], [1798, 274], [1670, 273], [1543, 275], [1414, 275], [1286, 274], [1157, 274], /* Movimiento Izquierda */[1048, 273], [919, 274], [791, 275], [662, 275], [535, 273], [407, 274], [279, 275], [150, 274], /* Salto Derecha */[1146, 911], [1282, 917], [1410, 920], [1537, 900], [1537, 900], [1667, 905], [1667, 905], [1795, 906], [1920, 907], /* Salto Izquierda */[1057, 911], [930, 917], [803, 920], [680, 900], [680, 900], [546, 905], [546, 905], [418, 906], [295, 907], /* Ataque Derecha */[1157, 400], [1285, 400], [1409, 400], [1537, 400], [1157, 518], [1286, 496], [1414, 490], [1544, 496], [1681, 534], [1153, 656], [1258, 656], [1397, 654], [1525, 651], /* Ataque Izquierda */[1051, 400], [923, 400], [751, 400], [630, 400], [1044, 519], [919, 496], [793, 490], [649, 496], [493, 534], [1062, 656], [935, 657], [767, 654], [658, 652]];
+        this.animacionSamurai = /* Estatico Derecha */[[1150, 11], [1278, 11], [1406, 11], [1534, 11], [1662, 11], [1789, 11], /* Estatico Izquierda */[1053, 11], [925, 11], [797, 11], [669, 11], [541, 11], [414, 11], /* Movimiento Derecha */[2054, 274], [1926, 275], [1798, 274], [1670, 273], [1543, 275], [1414, 275], [1286, 274], [1157, 274], /* Movimiento Izquierda */[1048, 273], [919, 274], [791, 275], [662, 275], [535, 273], [407, 274], [279, 275], [150, 274], /* Salto Derecha */[1146, 911], [1282, 917], [1410, 920], [1537, 900], [1537, 900], [1667, 905], [1667, 905], [1795, 906], [1920, 907], /* Salto Izquierda */[1057, 911], [930, 917], [803, 920], [680, 900], [680, 900], [546, 905], [546, 905], [418, 906], [295, 907], /* Ataque Derecha */[1157, 400], [1285, 400], [1409, 400], [1537, 400], [1157, 518], [1286, 496], [1414, 490], [1544, 496], [1681, 534], [1153, 656], [1258, 656], [1397, 654], [1525, 651], /* Ataque Izquierda */[1051, 400], [923, 400], [751, 400], [630, 400], [1044, 519], [919, 496], [793, 490], [649, 496], [493, 534], [1062, 656], [935, 657], [767, 654], [658, 652], /* Herido Derecha */ [1146, 1038], [1273, 1038], [1400, 1038], /* Herido Izquierda */ [1058, 1038], [930, 1038], [802, 1038], /* Muerte Derecha */ [1150, 1168], [1277, 1168], [1410, 1177], [1539, 1184], [1668, 1188], [1804, 1218], /* Muerte Izquierda */ [1069, 1168], [939, 1168], [809, 1177], [682, 1184], [546, 1188], [396, 1218]];
 
         this.posicionTamaño = 0;
-        this.tamañoAnimacion = /* Estatico */[[58, 70], /* Corriendo */[54, 64], /* Saltando */[56, 67], [47, 61], [47, 58], [42, 72], [42, 72], [46, 59], [46, 59], [46, 59], [44, 65], /* Atacando */[50, 65], [50, 65], [98, 65], [92, 65], [57, 75], [53, 97], [51, 103], [65, 97], [85, 59], [44, 65], [66, 65], [95, 67], [75, 70]];
+        this.tamañoAnimacion = /* Estatico */[[58, 70], /* Corriendo */[54, 64], /* Saltando */[56, 67], [47, 61], [47, 58], [42, 72], [42, 72], [46, 59], [46, 59], [46, 59], [44, 65], /* Atacando */[50, 65], [50, 65], [98, 65], [92, 65], [57, 75], [53, 97], [51, 103], [65, 97], [85, 59], [44, 65], [66, 65], [95, 67], [75, 70], /* Herido */ [55,68], /* Muerte */ [41, 66], [42, 66], [40,57], [38, 50], [45, 46], [58, 16]];
 
         this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
         this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
@@ -80,6 +85,13 @@ window.onload = function () {
     samurai.prototype.comprobarVida = function () {
         if (this.vida <= 0){
             this.vida = 0;
+            if (ninja.derecha || ninja.estaticoDerecha){
+                ninja.muerteDerecha = true;
+                finDelJuego();
+            } else {
+                ninja.muerteIzquierda = true;
+                finDelJuego();
+            }
         }
     }
 
@@ -95,11 +107,11 @@ window.onload = function () {
             0,
             0,
             50,
-            50,
+            24,
             15,
+            60,
             50,
-            50,
-            50
+            24
         );
     }
     function mostrarVida() {
@@ -131,6 +143,31 @@ window.onload = function () {
             7,
             15
         );
+    }
+
+    function finDelJuego() {
+        clearInterval(id1);
+        console.log("Fin intervalo 1");
+        clearInterval(id2);
+        console.log("Fin intervalo 2");
+        id3 = setInterval(animacionFinJuego, 400);
+    }
+
+    function animacionFinJuego() {
+        limpiarLienzo();
+        ctx.fillStyle = "black";
+        ctx.fillRect(0,0, canvas.width, valorRectanguloFinal);
+        ctx.fillRect(0,canvas.height, canvas.width, -valorRectanguloFinal);
+        valorRectanguloFinal += 80;
+        ctx.fillStyle = "white";
+        ctx.font = "40px Cinzel";
+        ctx.fillText("NADIE DIJO QUE SERÍA FÁCIL", 300, 250);
+        if (ninja.muerteDerecha){
+            animacionMuerteDerecha();
+        } else {
+            animacionMuerteIzquierda();
+        }
+        pintarNinja();
     }
 
     /* 
@@ -484,6 +521,60 @@ window.onload = function () {
 
     }
 
+    function animacionHeridaDerecha() {
+        ninja.posicionTamaño = 24;
+        ninja.totalAnimacion = 3;
+        ninja.posicionAnimacion = 72 + (ninja.posicionAnimacion + 1) % ninja.totalAnimacion;
+        if (ninja.posicionAnimacion = 74){
+            ninja.heridoDerecha = false;
+        }
+    
+    }
+
+    function animacionHeridaIzquierda() {
+        ninja.posicionTamaño = 24;
+        ninja.totalAnimacion = 3;
+        ninja.posicionAnimacion = 75 + (ninja.posicionAnimacion + 1) % ninja.totalAnimacion;
+        if (ninja.posicionAnimacion = 77){
+            ninja.heridoIzquierda = false;
+        }
+    }
+
+    function animacionMuerteDerecha() {
+        if (ninja.posicionTamaño < 25 || ninja.posicionTamaño > 30) {
+            ninja.posicionTamaño = 25;
+            ninja.posicionAnimacion = 78;
+        }
+
+        if (ninja.posicionAnimacion < 83) {
+            ninja.posicionTamaño++;
+            ninja.posicionAnimacion++;
+        } else {
+            clearInterval(id3);
+            console.log("Fin del juego");
+        }
+        ninja.recalcularTamaño();
+        ninja.recalcularY();
+
+    }
+
+    function animacionMuerteIzquierda() {
+        if (ninja.posicionTamaño < 25 || ninja.posicionTamaño > 30) {
+            ninja.posicionTamaño = 25;
+            ninja.posicionAnimacion = 84;
+        }
+
+        if (ninja.posicionAnimacion < 89) {
+            ninja.posicionTamaño++;
+            ninja.posicionAnimacion++;
+        } else {
+            clearInterval(id3);
+            console.log("Fin del juego");
+        }
+        ninja.recalcularTamaño();
+        ninja.recalcularY();
+    }
+
     /*
     =======================================
     || Constructor Enemigo general
@@ -525,6 +616,9 @@ window.onload = function () {
                 } else {
                     ninja.vida -= 1;
                     ninja.comprobarVida();
+                    if (!ninja.saltoDerecha && !ninja.saltoIzquierda){ // Que solo haga la animacion de herido si salta, que si mezclamos ambas animaciones se puede quedar el personaje levitando
+                        ninja.heridoDerecha = true;
+                    }
                 }
             } else { // Colisión en el lado izquierdo
                 if (ninja.ataqueIzquierda === true) {
@@ -532,6 +626,9 @@ window.onload = function () {
                 } else {
                     ninja.vida -= 1;
                     ninja.comprobarVida();
+                    if (!ninja.saltoDerecha && !ninja.saltoIzquierda){ // Que solo haga la animacion de herido si salta, que si mezclamos ambas animaciones se puede quedar el personaje levitando
+                        ninja.heridoIzquierda = true;
+                    }
                 }
             }
         } else if (ninjaIzquierda >= enemigoDerecha) {
@@ -678,7 +775,11 @@ window.onload = function () {
         }
 
         // Ejecutamos la animación que corresponda
-        if (ninja.saltoDerecha) {
+        if (ninja.heridoDerecha){
+            animacionHeridaDerecha();
+        } else if (ninja.heridoIzquierda){
+            animacionHeridaIzquierda();
+        } else if (ninja.saltoDerecha) {
             animacionSaltoDerecha();
         } else if (ninja.saltoIzquierda) {
             animacionSaltoIzquierda();
@@ -734,7 +835,7 @@ window.onload = function () {
     samurai.prototype.imagen = imagenSamurai;
 
     iconoVida = new Image();
-    iconoVida.src = "assets/images/iconoVida.png";
+    iconoVida.src = "assets/images/sangre.png";
 
     iconoVidaIzq = new Image();
     iconoVidaIzq.src = "assets/images/barraVidaIzquierda.png";
@@ -749,5 +850,6 @@ window.onload = function () {
     crearEnemigosEspadas();
     let id1 = setInterval(iniciar, 1000 / 60);
     let id2 = setInterval(animacion, 1000 / 10);
+    let id3;
     ctx.fillStyle = "#800000"; // Para el cuadrado de la vida
 }
