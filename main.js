@@ -12,7 +12,7 @@ window.onload = function () {
     let x = 450; // Coordenada ninja inicial
     let y = 470; // Coordenada ninja inicial
     let ySuelo = 540;
-    let numeroEnemigosEspadas = 1;
+    let numeroEnemigosEspadas = 0;
     let matrizEnemigosEspadas = [];
     let enemigoEspada;
     let ninjaIzquierda; // Coordenada X
@@ -604,9 +604,10 @@ window.onload = function () {
             ninja.posicionAnimacion++;
         } else {
             clearInterval(id3);
+            delete ninja;
             console.log("Fin del juego");
-            botonEmpezar.disabled = false;
             botonEmpezar.style.textDecoration = "none";
+            botonEmpezar.disabled = false;
         }
         ninja.recalcularTamaño();
         ninja.recalcularY();
@@ -624,9 +625,10 @@ window.onload = function () {
             ninja.posicionAnimacion++;
         } else {
             clearInterval(id3);
+            delete ninja;
             console.log("Fin del juego");
-            botonEmpezar.disabled = false;
             botonEmpezar.style.textDecoration = "none";
+            botonEmpezar.disabled = false;
         }
         ninja.recalcularTamaño();
         ninja.recalcularY();
@@ -951,11 +953,9 @@ window.onload = function () {
     */
 
     function eliminarEnemigos() {
-        if (matrizEnemigosEspadas.length > 0) {
-            for (let i = 0; i < matrizEnemigosEspadas.length; i++) {
-                matrizEnemigosEspadas.splice(i, 1);
-            }
-        }
+        console.log(matrizEnemigosEspadas.length);
+        matrizEnemigosEspadas.splice(0, matrizEnemigosEspadas.length); // Borramos enemigos
+        console.log(matrizEnemigosEspadas.length);
     }
 
     /*
@@ -1042,6 +1042,7 @@ window.onload = function () {
         botonEmpezar.disabled = true;
         botonEmpezar.style.textDecoration = "line-through";
         ninja = new samurai(x, y);
+        numeroEnemigosEspadas = 1;
         crearEnemigosEspadas();
         limpiarLienzo();
         mostrarIconoVida(); // Se inicia solo una vez
