@@ -603,11 +603,7 @@ window.onload = function () {
             ninja.posicionTamaño++;
             ninja.posicionAnimacion++;
         } else {
-            clearInterval(id3);
-            delete ninja;
-            console.log("Fin del juego");
-            botonEmpezar.style.textDecoration = "none";
-            botonEmpezar.disabled = false;
+            terminarIntervaloFinal();
         }
         ninja.recalcularTamaño();
         ninja.recalcularY();
@@ -624,14 +620,18 @@ window.onload = function () {
             ninja.posicionTamaño++;
             ninja.posicionAnimacion++;
         } else {
-            clearInterval(id3);
-            delete ninja;
-            console.log("Fin del juego");
-            botonEmpezar.style.textDecoration = "none";
-            botonEmpezar.disabled = false;
+            terminarIntervaloFinal();
         }
         ninja.recalcularTamaño();
         ninja.recalcularY();
+    }
+
+    function terminarIntervaloFinal() {
+        clearInterval(id3);
+        delete ninja; // Si no borramos el objeto, se puede dar un bug a la hora de volver a iniciar una partida
+        console.log("Fin del juego");
+        botonEmpezar.style.textDecoration = "none";
+        botonEmpezar.disabled = false;
     }
 
     /*
@@ -953,9 +953,7 @@ window.onload = function () {
     */
 
     function eliminarEnemigos() {
-        console.log(matrizEnemigosEspadas.length);
         matrizEnemigosEspadas.splice(0, matrizEnemigosEspadas.length); // Borramos enemigos
-        console.log(matrizEnemigosEspadas.length);
     }
 
     /*
