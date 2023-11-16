@@ -25,6 +25,9 @@ window.onload = function () {
     let enemigoAbajo; // Coordenada Y mas su tamaño Y
     let valorRectanguloFinal = 0; // Valor para hacer el efecto cortina al acabar el juego
     let contadorEnemigosAsesinados;
+    let dificultad;
+    let imagenPortalVerde;
+    let imagenPortalMorado;
 
     // Borra todo
     function limpiarLienzo() {
@@ -186,38 +189,6 @@ window.onload = function () {
             7,
             15
         );
-    }
-
-    function finDelJuego() {
-        eliminarEnemigos(); // Limpiamos enemigos para la siguiente partida
-        clearInterval(id1); // Limpiamos intervalo del juego
-        console.log("Fin intervalo 1");
-        clearInterval(id2); // Limpiamos intervalo de las animaciones
-        console.log("Fin intervalo 2");
-        id3 = setInterval(animacionFinJuego, 400); // Creamos un nuevo intervalo destinado a la animcion final del juego
-    }
-
-    function animacionFinJuego() {
-        limpiarLienzo();
-
-        // Cremamos el efecto cortina
-        ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, canvas.width, valorRectanguloFinal);
-        ctx.fillRect(0, canvas.height, canvas.width, -valorRectanguloFinal);
-        valorRectanguloFinal += 80;
-
-        // Metemos texto
-        ctx.fillStyle = "white";
-        ctx.font = "40px Cinzel";
-        ctx.fillText("NADIE DIJO QUE SERÍA FÁCIL", 300, 250);
-
-        // Animamos al personaje muriendo
-        if (ninja.muerteDerecha) {
-            animacionMuerteDerecha();
-        } else {
-            animacionMuerteIzquierda();
-        }
-        pintarNinja();
     }
 
     /* 
@@ -1020,6 +991,105 @@ window.onload = function () {
         }
     }
 
+    /*
+    =======================================
+    || Gestion del juego
+    ========================================
+    */
+
+    // Niveles de dificultad
+
+    function inicioDelJuego() {
+        limpiarLienzo();
+
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, valorRectanguloFinal);
+        ctx.fillRect(0, canvas.height, canvas.width, -valorRectanguloFinal);
+        valorRectanguloFinal += 80;
+
+        // Metemos texto
+        ctx.fillStyle = "white";
+        ctx.font = "40px Cinzel";
+        ctx.fillText("Elige tu propio infierno: la calma que precede a la tormenta o la guerra contra tu destino.", 300, 250);
+    }
+
+    function portal(){
+        this.tamañoX;
+        this.tamañoY;
+        this.x;
+        this.y = ySuelo - this.tamañoY;
+        this.imagen;
+
+        this.posicionAnimacion = 0;
+        this.animacionPortal = [/* Abriendo */ [19, 94], [81, 94], [145, 92], [214, 89], [281, 81], [345, 78], [409, 81], [473, 79]];
+
+        this.posicionTamaño = 0;
+        this.tamañoAnimacion = [/* Abriendo */ [22, 2], [26, 4], [27, 9], [16, 18], [12, 33], [12, 42], [12, 39], [12, 40]];
+
+        this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
+        this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
+        this.imagen;
+    }
+
+    portal.prototype.recalcularTamaño = function () {
+        this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
+        this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
+    }
+
+    portal.prototype.recalcularY = function () {
+        this.y = ySuelo - this.tamañoY;
+    }
+
+    portal.prototype.abrir = function () {
+        if (this.posicionTamaño > 7) {
+            this.posicionTamaño = 0;
+            this.posicionAnimacion = 0;
+        }
+
+        if (this.posicionAnimacion < 7) {
+            this.posicionTamaño++;
+            this.posicionAnimacion++;
+        }
+
+        this.recalcularTamaño();
+        this.recalcularY();
+    }
+
+    // Final de la partida
+
+    function finDelJuego() {
+        eliminarEnemigos(); // Limpiamos enemigos para la siguiente partida
+        clearInterval(id1); // Limpiamos intervalo del juego
+        console.log("Fin intervalo 1");
+        clearInterval(id2); // Limpiamos intervalo de las animaciones
+        console.log("Fin intervalo 2");
+        id3 = setInterval(animacionFinJuego, 400); // Creamos un nuevo intervalo destinado a la animcion final del juego
+    }
+
+    function animacionFinJuego() {
+        limpiarLienzo();
+
+        // Cremamos el efecto cortina
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, canvas.width, valorRectanguloFinal);
+        ctx.fillRect(0, canvas.height, canvas.width, -valorRectanguloFinal);
+        valorRectanguloFinal += 80;
+
+        // Metemos texto
+        ctx.fillStyle = "white";
+        ctx.font = "40px Cinzel";
+        ctx.fillText("NADIE DIJO QUE SERÍA FÁCIL", 300, 250);
+
+        // Animamos al personaje muriendo
+        if (ninja.muerteDerecha) {
+            animacionMuerteDerecha();
+        } else {
+            animacionMuerteIzquierda();
+        }
+        pintarNinja();
+    }
+
+
     /* 
     ============================================================
     ||   CODIGO DE "UN SOLO USO"
@@ -1052,6 +1122,11 @@ window.onload = function () {
         id2 = setInterval(animacion, 1000 / 10);
     }
 
+    imagenPortalVerde = new Image();
+    imagenPortalVerde.src = "assets/sprites/portales/verde.png"
+
+    imagenPortalMorado = new Image();
+    imagenPortalMorado.src = "assets/sprites/portales/morado.png"
 
     imagenSamurai = new Image();
     imagenSamurai.src = "assets/sprites/samurai/samuraiDefinitivo.png";
@@ -1072,6 +1147,7 @@ window.onload = function () {
     document.addEventListener("keydown", activaMovimiento, false);
     document.addEventListener("keyup", paraMovimiento, false);
 
+    let idInicio;
     let id1;
     let id2;
     let id3;
