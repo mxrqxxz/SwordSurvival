@@ -36,6 +36,8 @@ window.onload = function () {
     let imagenPortalVerde;
     let portalMorado;
     let imagenPortalMorado;
+    let recordEnemigos = localStorage.getItem('recordEnemigos');
+    let cadenaRecordEnemigos;
 
     // Borra todo
     function limpiarLienzo() {
@@ -1176,6 +1178,19 @@ window.onload = function () {
     // Final de la partida
 
     function finDelJuego() {
+
+        // Gestionamos records
+
+        if (contadorEnemigosAsesinados > recordEnemigos){
+            cadenaRecordEnemigos = "Enemigos Asesinados: " + contadorEnemigosAsesinados + ", ¡¡Nuevo Récord!!";
+            localStorage.setItem('recordEnemigos', contadorEnemigosAsesinados);
+            recordEnemigos = contadorEnemigosAsesinados;
+        } else if (contadorEnemigosAsesinados <= recordEnemigos){
+            cadenaRecordEnemigos = "Enemigos Asesinados: " + contadorEnemigosAsesinados + " -- El récord está en: " + recordEnemigos;
+        }
+
+        // Empezamos con el final de la partida
+
         eliminarEnemigos(); // Limpiamos enemigos para la siguiente partida
         clearInterval(id1); // Limpiamos intervalo del juego
         console.log("Fin intervalo 1");
@@ -1198,6 +1213,8 @@ window.onload = function () {
         ctx.fillStyle = "white";
         ctx.font = "40px Cinzel";
         ctx.fillText("NADIE DIJO QUE SERÍA FÁCIL", 300, 250);
+        ctx.font = "30px Cinzel";
+        ctx.fillText(cadenaRecordEnemigos, 250, 350);
 
         // Animamos al personaje muriendo
         if (ninja.muerteDerecha) {
