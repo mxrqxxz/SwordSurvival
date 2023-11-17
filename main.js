@@ -1,6 +1,10 @@
 window.onload = function () {
     let canvas;
     let ctx;
+    let idInicio;
+    let id1;
+    let id2;
+    let id3;
     let botonEmpezar;
     let ninja;
     let imagenSamurai;
@@ -9,7 +13,7 @@ window.onload = function () {
     let iconoVidaDer;
     let iconoCalavera;
     let imagenEnemigoEspadas;
-    let x = 450; // Coordenada ninja inicial
+    let x = 550; // Coordenada ninja inicial
     let y = 470; // Coordenada ninja inicial
     let ySuelo = 540;
     let numeroEnemigosEspadas = 0;
@@ -23,10 +27,14 @@ window.onload = function () {
     let enemigoDerecha; // Coordenada X mas su tamaño X
     let enemigoArriba; // Coordenada Y
     let enemigoAbajo; // Coordenada Y mas su tamaño Y
-    let valorRectanguloFinal = 0; // Valor para hacer el efecto cortina al acabar el juego
+    let portalIzquierda;
+    let portalDerecha;
+    let valorRectanguloFinal; // Valor para hacer el efecto cortina al acabar el juego
     let contadorEnemigosAsesinados;
     let dificultad;
+    let portalVerde;
     let imagenPortalVerde;
+    let portalMorado;
     let imagenPortalMorado;
 
     // Borra todo
@@ -790,7 +798,7 @@ window.onload = function () {
             enemigoEspada.vida = 30; // Mueren de un ataque
             matrizEnemigosEspadas.push(enemigoEspada);
 
-            if (Math.random() < 0.5){
+            if (Math.random() < 0.5) {
                 enemigoEspada.x = (0 - enemigoEspada.tamañoX) + (Math.random() * -200);
             } else {
                 enemigoEspada.x = canvas.width + (Math.random() * 200);
@@ -802,7 +810,7 @@ window.onload = function () {
 
         // Antes de pintar eliminamos del array los enemigos muertos
 
-        if (matrizEnemigosEspadas.length > 0){
+        if (matrizEnemigosEspadas.length > 0) {
             matrizEnemigosEspadas = matrizEnemigosEspadas.filter(quitarEnemigosMuertos);
         } else {
             numeroEnemigosEspadas = numeroEnemigosEspadas * 2;
@@ -845,7 +853,7 @@ window.onload = function () {
             this.posicionTamaño++;
             this.posicionAnimacion++;
         } else {
-            if (this.ataqueDerecha === true){
+            if (this.ataqueDerecha === true) {
                 this.posicionTamaño = 6;
                 this.posicionAnimacion = 12;
             }
@@ -865,7 +873,7 @@ window.onload = function () {
             this.posicionTamaño++;
             this.posicionAnimacion++;
         } else {
-            if (this.ataqueIzquierda === true){
+            if (this.ataqueIzquierda === true) {
                 this.posicionTamaño = 6;
                 this.posicionAnimacion = 19;
             }
@@ -888,7 +896,7 @@ window.onload = function () {
 
             // El personaje muere del todo para borrar del array cuando ha terminado su
             // animacion de morir
-            
+
             this.muerto = true;
         }
 
@@ -909,7 +917,7 @@ window.onload = function () {
 
             // El personaje muere del todo para borrar del array cuando ha terminado su
             // animacion de morir
-            
+
             this.muerto = true;
         }
 
@@ -989,6 +997,24 @@ window.onload = function () {
                 }
             });
         }
+
+        // Control de animaciones de portales
+
+        if (portalVerde.abriendo) {
+            portalVerde.abrir();
+        } else if (portalVerde.estable){
+            portalVerde.estabilizar();
+        } else if (portalVerde.cerrando){
+            portalVerde.cerrar();
+        }
+
+        if (portalMorado.abriendo) {
+            portalMorado.abrir();
+        } else if (portalMorado.estable){
+            portalMorado.estabilizar();
+        } else if (portalMorado.cerrando){
+            portalMorado.cerrar();
+        }
     }
 
     /*
@@ -1000,31 +1026,51 @@ window.onload = function () {
     // Niveles de dificultad
 
     function inicioDelJuego() {
-        limpiarLienzo();
+        limpiarLienzoMenosDatos();
 
         ctx.fillStyle = "black";
-        ctx.fillRect(0, 0, canvas.width, valorRectanguloFinal);
-        ctx.fillRect(0, canvas.height, canvas.width, -valorRectanguloFinal);
-        valorRectanguloFinal += 80;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         // Metemos texto
         ctx.fillStyle = "white";
         ctx.font = "40px Cinzel";
-        ctx.fillText("Elige tu propio infierno: la calma que precede a la tormenta o la guerra contra tu destino.", 300, 250);
+        ctx.fillText("Elige tu propio infierno.", 350, 150);
+        ctx.font = "25px Cinzel";
+        ctx.fillText("La calma que precede a la tormenta", 50, 300);
+        ctx.fillText("La guerra contra tu destino", 700, 300);
+
+        pintarNinja();
+        portalVerde.pintar();
+        portalMorado.pintar();
     }
 
-    function portal(){
+    function iniciarPartida() {
+        clearInterval(idInicio);
+        limpiarLienzo();
+        mostrarIconoVida(); // Se inicia solo una vez
+        mostrarVida();
+        mostrarIconoCalavera(); // Se inicia solo una vez
+        contadorEnemigosAsesinados = 0;
+        mostrarContadorEnemigosAsesinados();
+        id1 = setInterval(iniciar, 1000 / 60);
+    }
+
+    function portal() {
         this.tamañoX;
         this.tamañoY;
         this.x;
-        this.y = ySuelo - this.tamañoY;
+        this.y = 500;
         this.imagen;
 
+        this.abriendo = true;
+        this.cerrando = false;
+        this.estable = false;
+
         this.posicionAnimacion = 0;
-        this.animacionPortal = [/* Abriendo */ [19, 94], [81, 94], [145, 92], [214, 89], [281, 81], [345, 78], [409, 81], [473, 79]];
+        this.animacionPortal = [/* Abriendo */[19, 94], [81, 94], [145, 92], [214, 89], [281, 81], [345, 78], [409, 81], [473, 79], /* Estable */ [345, 78], [409, 81], [473, 79], /* Cerrando */ [473, 79], [409, 81], [345, 78], [281, 81], [214, 89], [145, 92], [81, 94], [19, 94]];
 
         this.posicionTamaño = 0;
-        this.tamañoAnimacion = [/* Abriendo */ [22, 2], [26, 4], [27, 9], [16, 18], [12, 33], [12, 42], [12, 39], [12, 40]];
+        this.tamañoAnimacion = [/* Abriendo */[22, 2], [26, 4], [27, 9], [16, 18], [14, 33], [14, 42], [14, 39], [14, 40], /* Estable */ [14, 42], [14, 39], [14, 40], /* Cerrando */ [14, 40], [14, 39], [14, 42], [14, 33], [16, 18], [27, 9], [26, 4], [22, 2]];
 
         this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
         this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
@@ -1037,7 +1083,40 @@ window.onload = function () {
     }
 
     portal.prototype.recalcularY = function () {
-        this.y = ySuelo - this.tamañoY;
+        this.y = ySuelo - this.tamañoY * 3;
+    }
+
+    portal.prototype.pintar = function () {
+        ninjaIzquierda = ninja.x;
+        ninjaDerecha = ninja.x + ninja.tamañoX;
+        portalIzquierda = this.x;
+        portalDerecha = this.x + this.tamañoX;
+
+        if (ninjaIzquierda <= portalDerecha && ninjaDerecha >= portalIzquierda) {
+            this.estable = false;
+            this.cerrando = true;
+
+            if (ninja.x < 600){
+                dificultad = 1;
+                iniciarPartida();
+            } else {
+                dificultad = 2;
+                iniciarPartida();
+            }
+        }
+
+
+        ctx.drawImage(
+            this.imagen,
+            this.animacionPortal[this.posicionAnimacion][0],
+            this.animacionPortal[this.posicionAnimacion][1],
+            this.tamañoX,
+            this.tamañoY,
+            this.x,
+            this.y,
+            this.tamañoX * 5,
+            this.tamañoY * 3
+        );
     }
 
     portal.prototype.abrir = function () {
@@ -1049,6 +1128,45 @@ window.onload = function () {
         if (this.posicionAnimacion < 7) {
             this.posicionTamaño++;
             this.posicionAnimacion++;
+        } else {
+            this.abriendo = false;
+            this.estable = true;
+        }
+
+        this.recalcularTamaño();
+        this.recalcularY();
+    }
+
+    portal.prototype.estabilizar = function () {
+        if (this.posicionTamaño > 10 || this.posicionTamaño < 8) {
+            this.posicionTamaño = 8;
+            this.posicionAnimacion = 8;
+        }
+
+        if (this.posicionAnimacion < 10) {
+            this.posicionTamaño++;
+            this.posicionAnimacion++;
+        } else {
+            this.posicionTamaño = 8;
+            this.posicionAnimacion = 8;
+        }
+
+        this.recalcularTamaño();
+        this.recalcularY();
+    }
+
+    portal.prototype.cerrar = function () {
+        if (this.posicionTamaño > 18 || this.posicionTamaño < 11) {
+            this.posicionTamaño = 11;
+            this.posicionAnimacion = 11;
+        }
+
+        if (this.posicionAnimacion < 18) {
+            this.posicionTamaño++;
+            this.posicionAnimacion++;
+        } else {
+            this.posicionTamaño = 11;
+            this.posicionAnimacion = 11;
         }
 
         this.recalcularTamaño();
@@ -1063,6 +1181,7 @@ window.onload = function () {
         console.log("Fin intervalo 1");
         clearInterval(id2); // Limpiamos intervalo de las animaciones
         console.log("Fin intervalo 2");
+        valorRectanguloFinal = 0;
         id3 = setInterval(animacionFinJuego, 400); // Creamos un nuevo intervalo destinado a la animcion final del juego
     }
 
@@ -1113,12 +1232,15 @@ window.onload = function () {
         numeroEnemigosEspadas = 1;
         crearEnemigosEspadas();
         limpiarLienzo();
-        mostrarIconoVida(); // Se inicia solo una vez
-        mostrarVida();
-        mostrarIconoCalavera(); // Se inicia solo una vez
-        contadorEnemigosAsesinados = 0;
-        mostrarContadorEnemigosAsesinados();
-        id1 = setInterval(iniciar, 1000 / 60);
+
+        portalVerde = new portal();
+        portalVerde.x = 250;
+        portalVerde.imagen = imagenPortalVerde;
+        portalMorado = new portal();
+        portalMorado.x = 900;
+        portalMorado.imagen = imagenPortalMorado;
+
+        idInicio = setInterval(inicioDelJuego, 1000 / 60);
         id2 = setInterval(animacion, 1000 / 10);
     }
 
@@ -1146,9 +1268,4 @@ window.onload = function () {
 
     document.addEventListener("keydown", activaMovimiento, false);
     document.addEventListener("keyup", paraMovimiento, false);
-
-    let idInicio;
-    let id1;
-    let id2;
-    let id3;
 }
