@@ -13,12 +13,16 @@ window.onload = function () {
     let iconoVidaDer;
     let iconoCalavera;
     let imagenEnemigoEspadas;
+    let imagenEnemigoVerde;
     let x = 550; // Coordenada ninja inicial
     let y = 470; // Coordenada ninja inicial
     let ySuelo = 540;
     let numeroEnemigosEspadas = 0;
+    let numeroEnemigosVerdes = 0;
     let matrizEnemigosEspadas = [];
+    let matrizEnemigosVerdes = [];
     let enemigoEspada;
+    let enemigoVerde;
     let ninjaIzquierda; // Coordenada X
     let ninjaDerecha; // Coordenada X mas su tamaño X
     let ninjaArriba; // Coordenada Y
@@ -929,12 +933,198 @@ window.onload = function () {
 
     /*
     =======================================
+    || Constructor Enemigo Verde
+    ========================================
+    */
+
+
+    function orcoVerde() {
+
+        // -- Animaciones --
+
+        this.animacionEnemigo = [/* Corriendo Derecha */[873, 230], [970, 229], [1067, 228], [1163, 228], [1259, 228], [1354, 227], /* Corriendo Izquierda */[788, 230], [692, 229], [596, 228], [496, 228], [404, 228], [308, 227], /* Atacando derecha */[864, 323], [963, 320], [1078, 326], [1174, 326], [876, 420], [1065, 422], [1184, 422], /* Atacando Izquierda */[771, 323], [669, 320], [569, 326], [483, 326], [774, 420], [579, 422], [457, 422], /* Muerte Derecha */[895, 899], [895, 899], [895, 899], [895, 899], [991, 900], [991, 900], [991, 900], [991, 900], [1066, 903], [1066, 903], [1066, 903], [1066, 903], [1153, 940], [1153, 940], [1153, 940], [1153, 940], /* Muerte Izquierda */[775, 899], [775, 899], [775, 899], [775, 899], [681, 900], [681, 900], [681, 900], [681, 900], [588, 903], [588, 903], [588, 903], [588, 903], [487, 940], [487, 940], [487, 940], [487, 940]];
+
+        this.tamañoAnimacion = [/* Corriendo */[42, 57], [41, 58], [40, 59], [44, 59], [40,59], [41, 60], /* Atacando */[69, 60], [70, 63], [55, 57], [45, 57], [52, 59], [58, 57], [63, 57], /* Muriendo */ [33, 60], [33, 60], [33, 60], [33, 60], [31, 59], [31, 59], [31, 59], [31, 59], [49, 56], [49, 56], [49, 56], [49, 56], [63,19], [63,19], [63,19], [63,19]];
+
+        this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
+        this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
+
+        this.y = ySuelo - this.tamañoY; // Cada enemigo tendrá una coordenada Y distinta
+    }
+
+    imagenEnemigoVerde = new Image();
+    imagenEnemigoVerde.src = "assets/sprites/enemigos/orcohacha.png";
+    orcoVerde.prototype = new enemigo(); // Herencia
+    orcoVerde.prototype.imagen = imagenEnemigoVerde;
+    orcoVerde.prototype.recalcularTamaño = function () {
+        this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
+        this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
+    }
+
+    orcoVerde.prototype.recalcularY = function () {
+        this.y = ySuelo - this.tamañoY;
+    }
+
+    orcoVerde.prototype.pintar = function () {
+        this.mover();
+        ctx.drawImage(
+            this.imagen,
+            this.animacionEnemigo[this.posicionAnimacion][0],
+            this.animacionEnemigo[this.posicionAnimacion][1],
+            this.tamañoX,
+            this.tamañoY,
+            this.x,
+            this.y,
+            this.tamañoX,
+            this.tamañoY
+        );
+    }
+
+    function crearEnemigosVerdes() {
+        for (let i = 0; i < numeroEnemigosVerdes; i++) {
+            enemigoVerde = new orcoVerde();
+            enemigoVerde.vida = 30; // Mueren de un ataque
+            matrizEnemigosVerdes.push(enemigoVerde);
+
+            if (Math.random() < 0.5) {
+                enemigoVerde.x = (0 - enemigoVerde.tamañoX) + (Math.random() * -200);
+            } else {
+                enemigoVerde.x = canvas.width + (Math.random() * 200);
+            }
+        }
+    }
+
+    function pintarEnemigosVerdes() {
+
+        // Antes de pintar eliminamos del array los enemigos muertos
+
+        if (matrizEnemigosVerdes.length > 0) {
+            matrizEnemigosVerdes = matrizEnemigosVerdes.filter(quitarEnemigosMuertos);
+        } else {
+            numeroEnemigosVerdes = numeroEnemigosVerdes * 2;
+            crearEnemigosVerdes();
+        }
+
+        matrizEnemigosVerdes.forEach(element => {
+            element.pintar();
+        });
+    }
+
+    /*
+    ======================================================
+    || Animaciones enemigo verde
+    =======================================================
+    */
+
+    orcoVerde.prototype.animacionCorrerDerecha = function () {
+        this.totalAnimacion = 6;
+        this.posicionTamaño = 0 + (this.posicionTamaño + 1) % this.totalAnimacion;
+        this.posicionAnimacion = 0 + (this.posicionAnimacion + 1) % this.totalAnimacion;
+        this.recalcularTamaño();
+    }
+
+    orcoVerde.prototype.animacionCorrerIzquierda = function () {
+        this.totalAnimacion = 6;
+        this.posicionTamaño = 0 + (this.posicionTamaño + 1) % this.totalAnimacion;
+        this.posicionAnimacion = 6 + (this.posicionAnimacion + 1) % this.totalAnimacion;
+        this.recalcularTamaño();
+    }
+
+    orcoVerde.prototype.animacionAtaqueDerecha = function () {
+
+        if (this.posicionTamaño < 6 || this.posicionTamaño > 25) {
+            this.posicionTamaño = 6;
+            this.posicionAnimacion = 12;
+        }
+
+        if (this.posicionAnimacion < 18) {
+            this.posicionTamaño++;
+            this.posicionAnimacion++;
+        } else {
+            if (this.ataqueDerecha === true) {
+                this.posicionTamaño = 6;
+                this.posicionAnimacion = 12;
+            }
+        }
+        this.recalcularTamaño();
+
+    }
+
+    orcoVerde.prototype.animacionAtaqueIzquierda = function () {
+
+        if (this.posicionTamaño < 6 || this.posicionTamaño > 25) {
+            this.posicionTamaño = 6;
+            this.posicionAnimacion = 19;
+        }
+
+        if (this.posicionAnimacion < 25) {
+            this.posicionTamaño++;
+            this.posicionAnimacion++;
+        } else {
+            if (this.ataqueIzquierda === true) {
+                this.posicionTamaño = 6;
+                this.posicionAnimacion = 19;
+            }
+        }
+        this.recalcularTamaño();
+
+    }
+
+    orcoVerde.prototype.animacionMuerteDerecha = function () {
+
+        if (this.posicionTamaño < 13 || this.posicionTamaño > 28) {
+            this.posicionTamaño = 13;
+            this.posicionAnimacion = 26;
+        }
+
+        if (this.posicionAnimacion < 41) {
+            this.posicionTamaño++;
+            this.posicionAnimacion++;
+        } else {
+
+            // El personaje muere del todo para borrar del array cuando ha terminado su
+            // animacion de morir
+
+            this.muerto = true;
+        }
+
+        this.recalcularTamaño();
+        this.recalcularY();
+    }
+
+    orcoVerde.prototype.animacionMuerteIzquierda = function () {
+        if (this.posicionTamaño < 13 || this.posicionTamaño > 28) {
+            this.posicionTamaño = 13;
+            this.posicionAnimacion = 42;
+        }
+
+        if (this.posicionAnimacion < 56) {
+            this.posicionTamaño++;
+            this.posicionAnimacion++;
+        } else {
+
+            // El personaje muere del todo para borrar del array cuando ha terminado su
+            // animacion de morir
+
+            this.muerto = true;
+        }
+
+        this.recalcularTamaño();
+        this.recalcularY();
+    }
+
+    /*
+    =======================================
     || Eliminar todos los enemigos
     ========================================
     */
 
     function eliminarEnemigos() {
-        matrizEnemigosEspadas.splice(0, matrizEnemigosEspadas.length); // Borramos enemigos
+
+        // Borramos enemigos de todos los arrays de enemigos
+
+        matrizEnemigosEspadas.splice(0, matrizEnemigosEspadas.length);
+        matrizEnemigosVerdes.splice(0, matrizEnemigosVerdes.length);
     }
 
     /*
