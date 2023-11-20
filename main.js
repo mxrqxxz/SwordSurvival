@@ -14,15 +14,19 @@ window.onload = function () {
     let iconoCalavera;
     let imagenEnemigoEspadas;
     let imagenEnemigoVerde;
+    let imagenShuriken;
     let x = 550; // Coordenada ninja inicial
     let y = 470; // Coordenada ninja inicial
     let ySuelo = 540;
     let numeroEnemigosEspadas = 0;
     let numeroEnemigosVerdes = 0;
+    let numeroShurikens = 0;
     let matrizEnemigosEspadas = [];
     let matrizEnemigosVerdes = [];
+    let matrizShuriken = [];
     let enemigoEspada;
     let enemigoVerde;
+    let shurikenUnidad;
     let ninjaIzquierda; // Coordenada X
     let ninjaDerecha; // Coordenada X mas su tamaño X
     let ninjaArriba; // Coordenada Y
@@ -31,6 +35,10 @@ window.onload = function () {
     let enemigoDerecha; // Coordenada X mas su tamaño X
     let enemigoArriba; // Coordenada Y
     let enemigoAbajo; // Coordenada Y mas su tamaño Y
+    let shurikenIzquierda; // Coordenada X
+    let shurikenDerecha; // Coordenada X mas su tamaño X
+    let shurikenArriba; // Coordenada Y
+    let shurikenAbajo; // Coordenada Y mas su tamaño Y 
     let portalIzquierda;
     let portalDerecha;
     let valorRectanguloFinal; // Valor para hacer el efecto cortina al acabar el juego
@@ -749,6 +757,10 @@ window.onload = function () {
         return element.muerto === false;
     }
 
+    function quitarShurikenCaidos(element) {
+        return element.activo === true;
+    }
+
     /*
     =======================================
     || Constructor Enemigo de dos espadas
@@ -983,7 +995,7 @@ window.onload = function () {
     function crearEnemigosVerdes() {
         for (let i = 0; i < numeroEnemigosVerdes; i++) {
             enemigoVerde = new orcoVerde();
-            enemigoVerde.vida = 30; // Mueren de un ataque
+            enemigoVerde.vida = 60; // Mueren de dos ataques
             matrizEnemigosVerdes.push(enemigoVerde);
 
             if (Math.random() < 0.5) {
@@ -1125,6 +1137,110 @@ window.onload = function () {
 
         matrizEnemigosEspadas.splice(0, matrizEnemigosEspadas.length);
         matrizEnemigosVerdes.splice(0, matrizEnemigosVerdes.length);
+        shuriken.activo = false;
+    }
+
+    /*
+    =======================================
+    || Shuriken
+    ========================================
+    */
+
+    imagenShuriken = new Image();
+    imagenShuriken.src = "assets/sprites/enemigos/shuriken.png";
+
+    function shuriken() {
+        this.activo = true;
+        this.y = 120;
+        this.x = 0;
+        this.velocidad = 3;
+        this.imagen = imagenShuriken;
+        this.posicionAnimacion = 0;
+        this.posicionTamaño = 0;
+        this.animacion = [[0, 0], [1568, 130]];
+        this.tamaño = [[1394, 1394], [1074, 1074]];
+        this.derecha = false;
+    }
+
+    function crearShurikens () {
+        for (let i = 0; i < numeroShurikens; i++) {
+            shurikenUnidad = new shuriken();
+            shurikenUnidad.x = Math.random() * canvas.width;
+
+            //Determinamos si irá a izquierda o a derecha
+            Math.random() < 0.5 ? shurikenUnidad.derecha = true : shurikenUnidad;
+
+            matrizShuriken.push(shurikenUnidad);
+        }
+    }
+
+    shuriken.prototype.pintar = function () {
+
+        ninjaIzquierda = ninja.x;
+        ninjaDerecha = ninja.x + ninja.tamañoX;
+        ninjaArriba = ninja.y;
+        ninjaAbajo = ninja.y + ninja.tamañoY;
+        shurikenIzquierda = this.x;
+        shurikenDerecha = this.x + 30;
+        shurikenArriba = this.y;
+        shurikenAbajo = this.y + 30;
+
+        // Comprobamos colisiones
+
+        if (ninjaIzquierda <= shurikenDerecha && ninjaDerecha >= shurikenIzquierda && ninjaArriba <= shurikenAbajo && ninjaAbajo >= shurikenArriba) {
+            ninja.vida -= 10;
+            ninja.comprobarVida(); // Comprobar si muere
+            mostrarVida();
+        }
+
+        if (this.y >= ySuelo){
+            this.activo = false; 
+        } else {
+            this.y+= this.velocidad;
+            if (this.derecha){
+                this.x < canvas.width ? this.x += this.velocidad : this.activo = false;
+            } else {
+                this.x > 0 ? this.x-= this.velocidad : this.activo = false;
+            }
+        }
+
+        ctx.drawImage(
+            this.imagen,
+            this.animacion[this.posicionAnimacion][0],
+            this.animacion[this.posicionAnimacion][1],
+            this.tamaño[this.posicionTamaño][0],
+            this.tamaño[this.posicionTamaño][1],
+            this.x,
+            this.y,
+            30,
+            30
+        );
+    }
+
+    function pintarShurikens (){
+
+        // Antes de pintar eliminamos del array los shuriken caidos
+
+        if (matrizShuriken.length > 0) {
+            matrizShuriken = matrizShuriken.filter(quitarShurikenCaidos);
+        } else {
+            numeroShurikens =  Math.floor(Math.random() * 5);
+            crearShurikens();
+        }
+
+        matrizShuriken.forEach(element => {
+            element.pintar();
+        });
+    }
+
+    shuriken.prototype.girar = function () {
+        if (this.posicionAnimacion === 0){
+            this.posicionAnimacion++;
+            this.posicionTamaño = 1;
+        } else {
+            this.posicionAnimacion--;
+            this.posicionTamaño = 0;
+        }
     }
 
     /*
@@ -1186,6 +1302,32 @@ window.onload = function () {
                     element.animacionCorrerDerecha();
                 } else if (element.izquierdaAnimacion) {
                     element.animacionCorrerIzquierda();
+                }
+            });
+        }
+
+        if (matrizEnemigosVerdes.length > 0) {
+            matrizEnemigosVerdes.forEach(element => {
+                if (element.muerteDerecha) {
+                    element.animacionMuerteDerecha();
+                } else if (element.muerteIzquierda) {
+                    element.animacionMuerteIzquierda();
+                } else if (element.ataqueDerecha) {
+                    element.animacionAtaqueDerecha();
+                } else if (element.ataqueIzquierda) {
+                    element.animacionAtaqueIzquierda();
+                } else if (element.derechaAnimacion) {
+                    element.animacionCorrerDerecha();
+                } else if (element.izquierdaAnimacion) {
+                    element.animacionCorrerIzquierda();
+                }
+            });
+        }
+
+        if (matrizShuriken.length > 0) {
+            matrizShuriken.forEach(element => {
+                if (element.activo){
+                    element.girar();
                 }
             });
         }
@@ -1290,9 +1432,17 @@ window.onload = function () {
 
             if (ninja.x < 600){
                 dificultad = 1;
+                numeroEnemigosEspadas = 1;
+                crearEnemigosEspadas();
                 iniciarPartida();
             } else {
                 dificultad = 2;
+                numeroEnemigosEspadas = 1;
+                numeroEnemigosVerdes = 1;
+                numeroShurikens = 1;
+                crearEnemigosEspadas();
+                crearEnemigosVerdes();
+                crearShurikens();
                 iniciarPartida();
             }
         }
@@ -1425,6 +1575,10 @@ window.onload = function () {
     function iniciar() {
         limpiarLienzoMenosDatos();
         pintarEnemigosEspadas();
+
+        dificultad === 2 ? pintarEnemigosVerdes() : dificultad;
+        dificultad === 2 ? pintarShurikens() : dificultad;
+
         pintarNinja();
     }
 
@@ -1436,8 +1590,6 @@ window.onload = function () {
         botonEmpezar.disabled = true;
         botonEmpezar.style.textDecoration = "line-through";
         ninja = new samurai(x, y);
-        numeroEnemigosEspadas = 1;
-        crearEnemigosEspadas();
         limpiarLienzo();
 
         portalVerde = new portal();
