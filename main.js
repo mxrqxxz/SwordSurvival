@@ -50,7 +50,10 @@ window.onload = function () {
     let imagenPortalMorado;
     let recordEnemigos = localStorage.getItem('recordEnemigos');
     let cadenaRecordEnemigos;
-
+    let audioAtaque = document.getElementById('audioEspada');
+    let audioMuerte = document.getElementById('audioMuerte');
+    let audioFondo = document.getElementById('audioFondo');
+    let audioContador = document.getElementById('audioSumaContador');
     // Borra todo
     function limpiarLienzo() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -85,6 +88,21 @@ window.onload = function () {
         ctx.fillStyle = "white";
         ctx.font = "20px Cinzel";
         ctx.fillText(contadorEnemigosAsesinados, canvas.width - 60, 50);
+    }
+
+    function actualizarContadorEnemigosAsesinados() {
+        contadorEnemigosAsesinados++;
+        audioContador.play();
+        mostrarContadorEnemigosAsesinados();
+    }
+
+    function pararAudiosYMuerte() {
+        audioAtaque.pause();
+        audioContador.pause();
+        audioFondo.pause();
+        audioMuerte.currentTime = 0;
+        audioMuerte.play();
+        finDelJuego();
     }
 
     /* 
@@ -153,10 +171,10 @@ window.onload = function () {
             this.vida = 0;
             if (ninja.derecha || ninja.estaticoDerecha) {
                 ninja.muerteDerecha = true;
-                finDelJuego();
+                pararAudiosYMuerte();
             } else {
                 ninja.muerteIzquierda = true;
-                finDelJuego();
+                pararAudiosYMuerte();
             }
         }
     }
@@ -536,6 +554,8 @@ window.onload = function () {
 
     function animacionAtaqueDerecha() {
         if (ninja.posicionTamaño < 11 || ninja.posicionTamaño > 23) {
+            audioAtaque.currentTime = 0;
+            audioAtaque.play(); // Sonido de ataque, lo pongo aquí porque si te hieren y pulsas la e para atacar, se activa el ataque, solo que no realiza la animación y su efecto, lo lógico es que este aquí
             ninja.posicionTamaño = 11;
             ninja.posicionAnimacion = 46;
         }
@@ -552,6 +572,8 @@ window.onload = function () {
 
     function animacionAtaqueIzquierda() {
         if (ninja.posicionTamaño < 11 || ninja.posicionTamaño > 23) {
+            audioAtaque.currentTime = 0;
+            audioAtaque.play();
             ninja.posicionTamaño = 11;
             ninja.posicionAnimacion = 59;
         }
@@ -738,12 +760,10 @@ window.onload = function () {
         if (this.vida <= 0) {
             if (ninjaIzquierda <= enemigoIzquierda) {
                 this.muerteIzquierda = true;
-                contadorEnemigosAsesinados++;
-                mostrarContadorEnemigosAsesinados();
+                actualizarContadorEnemigosAsesinados();
             } else {
                 this.muerteDerecha = true;
-                contadorEnemigosAsesinados++;
-                mostrarContadorEnemigosAsesinados();
+                actualizarContadorEnemigosAsesinados();
             }
         }
     }
@@ -1386,6 +1406,7 @@ window.onload = function () {
         mostrarIconoCalavera(); // Se inicia solo una vez
         contadorEnemigosAsesinados = 0;
         mostrarContadorEnemigosAsesinados();
+        audioFondo.play();      
         id1 = setInterval(iniciar, 1000 / 60);
     }
 
@@ -1627,4 +1648,8 @@ window.onload = function () {
 
     document.addEventListener("keydown", activaMovimiento, false);
     document.addEventListener("keyup", paraMovimiento, false);
+    audioFondo.addEventListener("ended", function () {
+        audioFondo.currentTime = 0;
+        audioFondo.play();
+      });
 }
