@@ -13,18 +13,38 @@ body {
 h1 {
     margin-top: -5px;
 }
-button{
+
+.interacciones{
+    margin: auto;
+}
+
+.interacciones textarea{
     font-family: 'Montserrat', sans-serif;
+    float: left;
+    margin-left: 32%;
+    margin-right: 3%;
+    padding-top: 10px;
+    place-items: center;
+    text-align: center;
     font-size: large;
+    resize: none;
+    border-radius: 10px;
+    background-color: rgb(40, 40, 40);
+    color: white;
+}
+
+button{
+    font-size: large;
+    font-family: 'Montserrat', sans-serif;
     text-align: center;
     display: block;
-    margin: auto;
     place-items: center;
     background-color: rgb(40, 40, 40);
     color: white;
     border-radius: 10px;
     width: 200px;
     height: 50px;
+    margin-bottom: 20px;
 }
 
 canvas {
@@ -36,4 +56,14 @@ canvas {
     background-image: url(assets/images/Background.png);
     margin-top: 30px;
     margin-bottom: 30px;
+}
+
+table {
+    border: 1px solid black;
+    background-color: gray;
+    text-align: center;
+}
+
+td {
+    border: 1px solid black;
 }

@@ -6,6 +6,8 @@ window.onload = function () {
     let id2;
     let id3;
     let botonEmpezar;
+    let textoNombre;
+    let usuario;
     let ninja;
     let imagenSamurai;
     let iconoVida;
@@ -49,6 +51,7 @@ window.onload = function () {
     let portalMorado;
     let imagenPortalMorado;
     let recordEnemigos = localStorage.getItem('recordEnemigos');
+    let records = localStorage.getItem('records');
     let cadenaRecordEnemigos;
     let audioAtaque = document.getElementById('audioEspada');
     let audioMuerte = document.getElementById('audioMuerte');
@@ -645,8 +648,12 @@ window.onload = function () {
         clearInterval(id3);
         delete ninja; // Si no borramos el objeto, se puede dar un bug a la hora de volver a iniciar una partida
         console.log("Fin del juego");
-        botonEmpezar.style.textDecoration = "none";
-        botonEmpezar.disabled = false;
+        usuario = [textoNombre.value, contadorEnemigosAsesinados];
+        records.push(usuario);
+        localStorage.setItem('records', records);
+        gestionarRecords();
+        activarBoton();
+        activarNombre();
     }
 
     /*
@@ -1586,12 +1593,58 @@ window.onload = function () {
         pintarNinja();
     }
 
+    // GESTION DE LOS RECORDS
+
+    function gestionarRecords() {
+        if (records.length > 0){
+            let listaTablas = document.getElementsByTagName("table");
+            if (listaTablas.length === 0){
+                let tabla = document.createElement("table");
+                document.body.appendChild(tabla);
+                records.forEach(element => {
+                    let fila = document.createElement("tr");
+                    let columnaNombre = document.createElement("td");
+                    let textoColumnaNombre = document.createTextNode(element[0]);
+                    let columnaRecord = document.createElement("td");
+                    let textoColumnaRecord = document.createTextNode(element[1]);
+                    tabla.appendChild(fila);
+                    fila.appendChild(columnaNombre);
+                    columnaNombre.appendChild(textoColumnaNombre);
+                    fila.appendChild(columnaRecord);
+                    columnaRecord.appendChild(textoColumnaRecord);
+                });
+            } else {
+
+            }
+        }
+    }
+
 
     /* 
     ============================================================
     ||   CODIGO DE "UN SOLO USO"
     ============================================================
     */
+
+    function activarBoton() {
+        botonEmpezar.disabled = false;
+        botonEmpezar.style.textDecoration = "none";
+    }
+
+    function desactivarBoton() {
+        botonEmpezar.disabled = true;
+        botonEmpezar.style.textDecoration = "line-through";
+    }
+
+    function activarNombre() {
+        textoNombre.disabled = false;
+        textoNombre.style.textDecoration = "none";
+    }
+
+    function desactivarNombre() {
+        textoNombre.disabled = true;
+        textoNombre.style.textDecoration = "line-through";
+    }
 
     function iniciar() {
         limpiarLienzoMenosDatos();
@@ -1606,10 +1659,23 @@ window.onload = function () {
     canvas = document.getElementById("miCanvas");
     ctx = canvas.getContext('2d');
     botonEmpezar = document.getElementById("empezar");
+    textoNombre = document.getElementById("textarea");
+
+    desactivarBoton();
+
+    function comprobarNombre() {
+        if (textoNombre.value != " Introduce tu nombre aquí " && textoNombre.value != ""){
+            activarBoton();
+        } else {
+            desactivarBoton();
+        }
+    }
+
+    textoNombre.oninput = comprobarNombre;
 
     botonEmpezar.onclick = function () {
-        botonEmpezar.disabled = true;
-        botonEmpezar.style.textDecoration = "line-through";
+        desactivarBoton();
+        desactivarNombre();
         ninja = new samurai(x, y);
         limpiarLienzo();
 
@@ -1651,5 +1717,5 @@ window.onload = function () {
     audioFondo.addEventListener("ended", function () {
         audioFondo.currentTime = 0;
         audioFondo.play();
-      });
+    });
 }
