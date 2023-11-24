@@ -51,7 +51,7 @@ window.onload = function () {
     let portalMorado;
     let imagenPortalMorado;
     let recordEnemigos = localStorage.getItem('recordEnemigos');
-    let records = localStorage.getItem('records');
+    let records = [];
     let cadenaRecordEnemigos;
     let audioAtaque = document.getElementById('audioEspada');
     let audioMuerte = document.getElementById('audioMuerte');
@@ -648,9 +648,6 @@ window.onload = function () {
         clearInterval(id3);
         delete ninja; // Si no borramos el objeto, se puede dar un bug a la hora de volver a iniciar una partida
         console.log("Fin del juego");
-        usuario = [textoNombre.value, contadorEnemigosAsesinados];
-        records.push(usuario);
-        localStorage.setItem('records', records);
         gestionarRecords();
         activarBoton();
         activarNombre();
@@ -983,7 +980,7 @@ window.onload = function () {
 
         this.animacionEnemigo = [/* Corriendo Derecha */[873, 230], [970, 229], [1067, 228], [1163, 228], [1259, 228], [1354, 227], /* Corriendo Izquierda */[788, 230], [692, 229], [596, 228], [496, 228], [404, 228], [308, 227], /* Atacando derecha */[864, 323], [963, 320], [1078, 326], [1174, 326], [876, 420], [1065, 422], [1184, 422], /* Atacando Izquierda */[771, 323], [669, 320], [569, 326], [483, 326], [774, 420], [579, 422], [457, 422], /* Muerte Derecha */[895, 899], [895, 899], [895, 899], [895, 899], [991, 900], [991, 900], [991, 900], [991, 900], [1066, 903], [1066, 903], [1066, 903], [1066, 903], [1153, 940], [1153, 940], [1153, 940], [1153, 940], /* Muerte Izquierda */[775, 899], [775, 899], [775, 899], [775, 899], [681, 900], [681, 900], [681, 900], [681, 900], [588, 903], [588, 903], [588, 903], [588, 903], [487, 940], [487, 940], [487, 940], [487, 940]];
 
-        this.tamañoAnimacion = [/* Corriendo */[42, 57], [41, 58], [40, 59], [44, 59], [40,59], [41, 60], /* Atacando */[69, 60], [70, 63], [55, 57], [45, 57], [52, 59], [58, 57], [63, 57], /* Muriendo */ [33, 60], [33, 60], [33, 60], [33, 60], [31, 59], [31, 59], [31, 59], [31, 59], [49, 56], [49, 56], [49, 56], [49, 56], [63,19], [63,19], [63,19], [63,19]];
+        this.tamañoAnimacion = [/* Corriendo */[42, 57], [41, 58], [40, 59], [44, 59], [40, 59], [41, 60], /* Atacando */[69, 60], [70, 63], [55, 57], [45, 57], [52, 59], [58, 57], [63, 57], /* Muriendo */[33, 60], [33, 60], [33, 60], [33, 60], [31, 59], [31, 59], [31, 59], [31, 59], [49, 56], [49, 56], [49, 56], [49, 56], [63, 19], [63, 19], [63, 19], [63, 19]];
 
         this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
         this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
@@ -1189,7 +1186,7 @@ window.onload = function () {
         this.derecha = false;
     }
 
-    function crearShurikens () {
+    function crearShurikens() {
         for (let i = 0; i < numeroShurikens; i++) {
             shurikenUnidad = new shuriken();
             shurikenUnidad.x = Math.random() * canvas.width;
@@ -1220,14 +1217,14 @@ window.onload = function () {
             mostrarVida();
         }
 
-        if (this.y >= ySuelo){
-            this.activo = false; 
+        if (this.y >= ySuelo) {
+            this.activo = false;
         } else {
-            this.y+= this.velocidad;
-            if (this.derecha){
+            this.y += this.velocidad;
+            if (this.derecha) {
                 this.x < canvas.width ? this.x += this.velocidad : this.activo = false;
             } else {
-                this.x > 0 ? this.x-= this.velocidad : this.activo = false;
+                this.x > 0 ? this.x -= this.velocidad : this.activo = false;
             }
         }
 
@@ -1244,14 +1241,14 @@ window.onload = function () {
         );
     }
 
-    function pintarShurikens (){
+    function pintarShurikens() {
 
         // Antes de pintar eliminamos del array los shuriken caidos
 
         if (matrizShuriken.length > 0) {
             matrizShuriken = matrizShuriken.filter(quitarShurikenCaidos);
         } else {
-            numeroShurikens =  Math.floor(Math.random() * 5);
+            numeroShurikens = Math.floor(Math.random() * 5);
             crearShurikens();
         }
 
@@ -1261,7 +1258,7 @@ window.onload = function () {
     }
 
     shuriken.prototype.girar = function () {
-        if (this.posicionAnimacion === 0){
+        if (this.posicionAnimacion === 0) {
             this.posicionAnimacion++;
             this.posicionTamaño = 1;
         } else {
@@ -1353,7 +1350,7 @@ window.onload = function () {
 
         if (matrizShuriken.length > 0) {
             matrizShuriken.forEach(element => {
-                if (element.activo){
+                if (element.activo) {
                     element.girar();
                 }
             });
@@ -1363,17 +1360,17 @@ window.onload = function () {
 
         if (portalVerde.abriendo) {
             portalVerde.abrir();
-        } else if (portalVerde.estable){
+        } else if (portalVerde.estable) {
             portalVerde.estabilizar();
-        } else if (portalVerde.cerrando){
+        } else if (portalVerde.cerrando) {
             portalVerde.cerrar();
         }
 
         if (portalMorado.abriendo) {
             portalMorado.abrir();
-        } else if (portalMorado.estable){
+        } else if (portalMorado.estable) {
             portalMorado.estabilizar();
-        } else if (portalMorado.cerrando){
+        } else if (portalMorado.cerrando) {
             portalMorado.cerrar();
         }
     }
@@ -1413,7 +1410,7 @@ window.onload = function () {
         mostrarIconoCalavera(); // Se inicia solo una vez
         contadorEnemigosAsesinados = 0;
         mostrarContadorEnemigosAsesinados();
-        audioFondo.play();      
+        audioFondo.play();
         id1 = setInterval(iniciar, 1000 / 60);
     }
 
@@ -1429,10 +1426,10 @@ window.onload = function () {
         this.estable = false;
 
         this.posicionAnimacion = 0;
-        this.animacionPortal = [/* Abriendo */[19, 94], [81, 94], [145, 92], [214, 89], [281, 81], [345, 78], [409, 81], [473, 79], /* Estable */ [345, 78], [409, 81], [473, 79], /* Cerrando */ [473, 79], [409, 81], [345, 78], [281, 81], [214, 89], [145, 92], [81, 94], [19, 94]];
+        this.animacionPortal = [/* Abriendo */[19, 94], [81, 94], [145, 92], [214, 89], [281, 81], [345, 78], [409, 81], [473, 79], /* Estable */[345, 78], [409, 81], [473, 79], /* Cerrando */[473, 79], [409, 81], [345, 78], [281, 81], [214, 89], [145, 92], [81, 94], [19, 94]];
 
         this.posicionTamaño = 0;
-        this.tamañoAnimacion = [/* Abriendo */[22, 2], [26, 4], [27, 9], [16, 18], [14, 33], [14, 42], [14, 39], [14, 40], /* Estable */ [14, 42], [14, 39], [14, 40], /* Cerrando */ [14, 40], [14, 39], [14, 42], [14, 33], [16, 18], [27, 9], [26, 4], [22, 2]];
+        this.tamañoAnimacion = [/* Abriendo */[22, 2], [26, 4], [27, 9], [16, 18], [14, 33], [14, 42], [14, 39], [14, 40], /* Estable */[14, 42], [14, 39], [14, 40], /* Cerrando */[14, 40], [14, 39], [14, 42], [14, 33], [16, 18], [27, 9], [26, 4], [22, 2]];
 
         this.tamañoX = this.tamañoAnimacion[this.posicionTamaño][0];
         this.tamañoY = this.tamañoAnimacion[this.posicionTamaño][1];
@@ -1458,7 +1455,7 @@ window.onload = function () {
             this.estable = false;
             this.cerrando = true;
 
-            if (ninja.x < 600){
+            if (ninja.x < 600) {
                 dificultad = 1;
                 numeroEnemigosEspadas = 1;
                 crearEnemigosEspadas();
@@ -1549,11 +1546,11 @@ window.onload = function () {
 
         // Gestionamos records
 
-        if (contadorEnemigosAsesinados > recordEnemigos){
+        if (contadorEnemigosAsesinados > recordEnemigos) {
             cadenaRecordEnemigos = "Enemigos Asesinados: " + contadorEnemigosAsesinados + ", ¡¡Nuevo Récord!!";
             localStorage.setItem('recordEnemigos', contadorEnemigosAsesinados);
             recordEnemigos = contadorEnemigosAsesinados;
-        } else if (contadorEnemigosAsesinados <= recordEnemigos){
+        } else if (contadorEnemigosAsesinados <= recordEnemigos) {
             cadenaRecordEnemigos = "Enemigos Asesinados: " + contadorEnemigosAsesinados + " -- El récord está en: " + recordEnemigos;
         }
 
@@ -1595,28 +1592,71 @@ window.onload = function () {
 
     // GESTION DE LOS RECORDS
 
-    function gestionarRecords() {
-        if (records.length > 0){
-            let listaTablas = document.getElementsByTagName("table");
-            if (listaTablas.length === 0){
-                let tabla = document.createElement("table");
-                document.body.appendChild(tabla);
-                records.forEach(element => {
-                    let fila = document.createElement("tr");
-                    let columnaNombre = document.createElement("td");
-                    let textoColumnaNombre = document.createTextNode(element[0]);
-                    let columnaRecord = document.createElement("td");
-                    let textoColumnaRecord = document.createTextNode(element[1]);
-                    tabla.appendChild(fila);
-                    fila.appendChild(columnaNombre);
-                    columnaNombre.appendChild(textoColumnaNombre);
-                    fila.appendChild(columnaRecord);
-                    columnaRecord.appendChild(textoColumnaRecord);
-                });
-            } else {
+    function crearTablaActualizada() {
+        let tituloRecords = document.createElement("h3");
+        tituloRecords.appendChild(document.createTextNode("Tabla de Récords"));
+        document.body.appendChild(tituloRecords);
+        let tabla = document.createElement("table");
+        document.body.appendChild(tabla);
+        records.forEach(element => {
+            let fila = document.createElement("tr");
+            let columnaNombre = document.createElement("td");
+            let textoColumnaNombre = document.createTextNode(element[0]);
+            let columnaRecord = document.createElement("td");
+            let textoColumnaRecord = document.createTextNode(element[1]);
+            tabla.appendChild(fila);
+            fila.appendChild(columnaNombre);
+            columnaNombre.appendChild(textoColumnaNombre);
+            fila.appendChild(columnaRecord);
+            columnaRecord.appendChild(textoColumnaRecord);
+        });
+    }
 
+    function gestionarRecords() {
+
+
+        function ordenarRecords(record1, record2) {
+            if (record1[1] > record2[1]){
+                return 1;
+            } else if (record1[1] < record2[1]){
+                return -1;
+            } else {
+                return 0;
             }
         }
+
+        function limitar10records() {
+            records = records.slice(0, 10);
+        }
+
+        records.splice(0, records.length);
+        let recordsRecuperados = localStorage.getItem('records');
+        if (recordsRecuperados != null) {
+            recordsRecuperados = recordsRecuperados.split(",");
+            for (let i = 0; i < recordsRecuperados.length; i += 2) {
+                let nuevoRecord = [recordsRecuperados[i], recordsRecuperados[i + 1]];
+                records.push(nuevoRecord);
+            }
+        }
+
+        usuario = [textoNombre.value, contadorEnemigosAsesinados];
+        records.push(usuario);
+
+        records.sort(ordenarRecords());
+        limitar10records();
+
+        localStorage.setItem('records', records);
+
+        let listaTablas = document.getElementsByTagName("table");
+
+        if (listaTablas.length === 0) {
+            crearTablaActualizada();
+        } else {
+            document.body.removeChild(listaTablas[0]);
+            document.body.removeChild(document.body.lastChild);
+            crearTablaActualizada();
+        }
+
     }
 
 
@@ -1664,7 +1704,7 @@ window.onload = function () {
     desactivarBoton();
 
     function comprobarNombre() {
-        if (textoNombre.value != " Introduce tu nombre aquí " && textoNombre.value != ""){
+        if (textoNombre.value != " Introduce tu nombre aquí " && textoNombre.value != "") {
             activarBoton();
         } else {
             desactivarBoton();

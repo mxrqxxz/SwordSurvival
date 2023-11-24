@@ -58,12 +58,26 @@ canvas {
     margin-bottom: 30px;
 }
 
+h3 {
+    display: grid;
+    margin: auto;
+    place-items: center;
+    margin-bottom: 15px;
+    margin-top: 50px;
+}
+
 table {
     border: 1px solid black;
-    background-color: gray;
+    background-color: white;
     text-align: center;
+    color: white;
+    margin: auto;
+    border-radius: 10px;
 }
 
 td {
     border: 1px solid black;
+    background-color: gray;
+    border-radius: 10px;
+    width: 150px;
 }
