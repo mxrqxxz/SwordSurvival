@@ -50,9 +50,7 @@ window.onload = function () {
     let imagenPortalVerde;
     let portalMorado;
     let imagenPortalMorado;
-    let recordEnemigos = localStorage.getItem('recordEnemigos');
     let records = [];
-    let cadenaRecordEnemigos;
     let audioAtaque = document.getElementById('audioEspada');
     let audioMuerte = document.getElementById('audioMuerte');
     let audioFondo = document.getElementById('audioFondo');
@@ -1161,7 +1159,8 @@ window.onload = function () {
 
         matrizEnemigosEspadas.splice(0, matrizEnemigosEspadas.length);
         matrizEnemigosVerdes.splice(0, matrizEnemigosVerdes.length);
-        shuriken.activo = false;
+        matrizShuriken.splice(0, matrizShuriken.length);
+
     }
 
     /*
@@ -1544,16 +1543,6 @@ window.onload = function () {
 
     function finDelJuego() {
 
-        // Gestionamos records
-
-        if (contadorEnemigosAsesinados > recordEnemigos) {
-            cadenaRecordEnemigos = "Enemigos Asesinados: " + contadorEnemigosAsesinados + ", ¡¡Nuevo Récord!!";
-            localStorage.setItem('recordEnemigos', contadorEnemigosAsesinados);
-            recordEnemigos = contadorEnemigosAsesinados;
-        } else if (contadorEnemigosAsesinados <= recordEnemigos) {
-            cadenaRecordEnemigos = "Enemigos Asesinados: " + contadorEnemigosAsesinados + " -- El récord está en: " + recordEnemigos;
-        }
-
         // Empezamos con el final de la partida
 
         eliminarEnemigos(); // Limpiamos enemigos para la siguiente partida
@@ -1578,8 +1567,6 @@ window.onload = function () {
         ctx.fillStyle = "white";
         ctx.font = "40px Cinzel";
         ctx.fillText("NADIE DIJO QUE SERÍA FÁCIL", 300, 250);
-        ctx.font = "30px Cinzel";
-        ctx.fillText(cadenaRecordEnemigos, 250, 350);
 
         // Animamos al personaje muriendo
         if (ninja.muerteDerecha) {
@@ -1615,14 +1602,8 @@ window.onload = function () {
     function gestionarRecords() {
 
 
-        function ordenarRecords(record1, record2) {
-            if (record1[1] > record2[1]){
-                return 1;
-            } else if (record1[1] < record2[1]){
-                return -1;
-            } else {
-                return 0;
-            }
+        function ordenarRecords(r1, r2) {
+            return r2[1] - r1[1];
         }
 
         function limitar10records() {
@@ -1642,7 +1623,7 @@ window.onload = function () {
         usuario = [textoNombre.value, contadorEnemigosAsesinados];
         records.push(usuario);
 
-        records.sort(ordenarRecords());
+        records = records.sort(ordenarRecords);
         limitar10records();
 
         localStorage.setItem('records', records);
